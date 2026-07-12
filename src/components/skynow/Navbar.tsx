@@ -32,16 +32,10 @@ export default function Navbar() {
     setOpen(false);
   }, [pathname]);
 
-  const isHome = pathname === "/";
-
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-[oklch(0.13_0.03_265)]/95 backdrop-blur-md py-3 shadow-luxury border-b border-white/10"
-          : isHome
-          ? "bg-transparent py-5"
-          : "bg-[oklch(0.13_0.03_265)]/90 backdrop-blur-md py-4 shadow-sm border-b border-white/10"
+      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-500 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm ${
+        scrolled ? "py-3" : "py-4"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -63,14 +57,14 @@ export default function Navbar() {
                 key={item.to}
                 to={item.to}
                 className={`relative px-4 py-2 text-sm font-semibold tracking-wide transition-colors ${
-                  active ? "text-gold" : "text-white/80 hover:text-gold"
+                  active ? "text-brand" : "text-slate-600 hover:text-brand"
                 }`}
               >
                 {item.label}
                 {active && (
                   <motion.span
                     layoutId="nav-underline"
-                    className="absolute bottom-0 left-4 right-4 h-0.5 bg-gold"
+                    className="absolute bottom-0 left-4 right-4 h-0.5 bg-brand"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -92,7 +86,7 @@ export default function Navbar() {
         {/* Mobile Toggle */}
         <button
           onClick={() => setOpen(!open)}
-          className="grid h-10 w-10 place-items-center rounded-full border border-white/20 text-white hover:bg-white/10 xl:hidden cursor-pointer"
+          className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 xl:hidden cursor-pointer"
           aria-label={open ? "Close menu" : "Open menu"}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -122,11 +116,7 @@ export default function Navbar() {
             >
               {/* Drawer Header inside the blue box */}
               <div className="flex items-center justify-between pb-6 border-b border-white/10 mb-6">
-                <img
-                  src={logoImage}
-                  alt="SkyNow Holidays"
-                  className="h-9 w-auto object-contain"
-                />
+                <img src={logoImage} alt="SkyNow Holidays" className="h-9 w-auto object-contain" />
                 <button
                   onClick={() => setOpen(false)}
                   className="grid h-10 w-10 place-items-center rounded-full border border-white/20 text-white hover:bg-white/10 cursor-pointer"
