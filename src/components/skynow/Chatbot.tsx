@@ -106,7 +106,7 @@ function getBotResponse(input: string): { text: string; link?: { to: string; lab
     query.includes("support")
   ) {
     return {
-      text: "📞 **Contact SkyNow Holidays**:\n\n• **Email**: support@skynowholidays.com\n• **WhatsApp Support**: Available 24/7 during your travels\n• **Form**: Click the button below to fill out our quick inquiry form, and a dedicated expert will reply within 24 hours!",
+      text: "📞 **Contact SkyNow Holidays**:\n\n• **Email**: support@skynowhollidays.com\n• **WhatsApp Support**: Available 24/7 during your travels\n• **Form**: Click the button below to fill out our quick inquiry form, and a dedicated expert will reply within 24 hours!",
       link: { to: "/contact", label: "Contact Us Form" },
     };
   }

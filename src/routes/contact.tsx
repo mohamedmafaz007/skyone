@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Calendar, Mail, MapPin, Phone, Send, MessageCircle, Clock, Users, DollarSign } from "lucide-react";
+import { Calendar, Mail, MapPin, Phone, Send, MessageCircle, Clock, Users, DollarSign, Globe } from "lucide-react";
 import CommonHero from "@/components/skynow/CommonHero";
-import { destinations } from "@/components/skynow/data";
+import { useAppData } from "@/lib/dataStore";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
 function ContactPage() {
+  const { contact, addMessage, destinations } = useAppData();
   // Read search params to pre-fill destination or service
   const search: any = useSearch({ from: "/contact" });
   const [selectedDest, setSelectedDest] = useState("");
@@ -27,25 +28,23 @@ function ContactPage() {
     if (search.service) {
       setSelectedService(search.service);
     }
-  }, [search]);
+  }, [search, destinations]);
 
   return (
-    <div className="bg-background pb-20">
+    <div className="bg-background min-h-screen pb-20">
       <CommonHero
-        title="Contact Us"
-        subtitle="Consult a destination specialist and start mapping your next journey."
+        title="Contact Our Specialists"
+        subtitle="We design customized, high-end itineraries matching your specific style. Speak with us today."
         bgImage="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1600&q=80"
       />
 
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-        <div className="grid gap-12 lg:grid-cols-[1fr_1.3fr]">
-          {/* Col 1: Details */}
+      <div className="mx-auto mt-20 max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-12 lg:grid-cols-2">
+          {/* Col 1: High-end Info Card */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="space-y-6"
+            animate={{ opacity: 1, x: 0 }}
+            className="flex flex-col justify-between gap-8 rounded-[40px] border border-border bg-muted/30 p-8 sm:p-12"
           >
             <div>
               <span className="text-xs font-bold uppercase tracking-[0.3em] text-brand">Connect</span>
@@ -60,11 +59,12 @@ function ContactPage() {
 
             <div className="grid gap-3">
               {[
-                { icon: MapPin, label: "Office Address", value: "SkyNow Holidays, MG Road, Bengaluru — 560001" },
-                { icon: Phone, label: "Direct Phone", value: "+91 12345 67890", href: "tel:+911234567890" },
-                { icon: MessageCircle, label: "WhatsApp Support", value: "Chat with a Specialist 24/7", href: "https://wa.me/911234567890" },
-                { icon: Mail, label: "Email Queries", value: "hello@skynowholidays.com", href: "mailto:hello@skynowholidays.com" },
-                { icon: Clock, label: "Business Hours", value: "Mon – Sun · 9 AM – 9 PM IST" },
+                { icon: MapPin, label: "Office Address", value: contact.address },
+                { icon: Phone, label: "Direct Phone", value: contact.phone, href: `tel:${contact.phone}` },
+                { icon: MessageCircle, label: "WhatsApp Support", value: "Chat with a Specialist 24/7", href: contact.whatsapp },
+                { icon: Mail, label: "Email Queries", value: contact.email, href: `mailto:${contact.email}` },
+                { icon: Globe, label: "Website", value: contact.website, href: contact.website.startsWith("http") ? contact.website : `https://${contact.website}` },
+                { icon: Clock, label: "Business Hours", value: contact.hours },
               ].map((info, idx) => (
                 <a
                   key={idx}
@@ -88,7 +88,7 @@ function ContactPage() {
             <div className="overflow-hidden rounded-[30px] border border-border shadow-sm">
               <iframe
                 title="Office map"
-                src="https://www.google.com/maps?q=Bengaluru%20MG%20Road&output=embed"
+                src={contact.mapIframe}
                 className="h-64 w-full border-0"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -106,8 +106,35 @@ function ContactPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const name = formData.get("name") as string;
+                const phone = formData.get("phone") as string;
+                const email = formData.get("email") as string;
+
+                const dateInput = e.currentTarget.querySelector("input[type='date']") as HTMLInputElement;
+                const date = dateInput ? dateInput.value : "Not Specified";
+
+                const guestsInput = e.currentTarget.querySelector("input[type='number']") as HTMLInputElement;
+                const guests = guestsInput && guestsInput.value ? `${guestsInput.value} Guests` : "Not Specified";
+
+                const textareaEl = e.currentTarget.querySelector("textarea") as HTMLTextAreaElement;
+                const message = textareaEl ? textareaEl.value : "";
+
+                addMessage({
+                  name,
+                  phone,
+                  email,
+                  destination: selectedDest || "General Inquiry",
+                  service: selectedService || "Standard Holiday Tour",
+                  travelDate: date || "Not Specified",
+                  guests: guests || "Not Specified",
+                  message: message || "Trip Planner form inquiry submitted from contact page."
+                });
                 setSent(true);
                 setTimeout(() => setSent(false), 4000);
+                e.currentTarget.reset();
+                setSelectedDest("");
+                setSelectedService("");
               }}
               className="glass rounded-[36px] p-6 sm:p-10 shadow-luxury border border-border bg-white"
             >
@@ -202,7 +229,7 @@ function ContactPage() {
             </form>
           </motion.div>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

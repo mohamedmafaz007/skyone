@@ -43,45 +43,47 @@ const destinationDetailsDb: Record<
   }
 > = {
   bali: {
-    overview: "Experience the ultimate tropical getaway in Bali, the Island of the Gods. Famous for its volcanic mountains, iconic rice paddies, sandy beaches, and vibrant cultural heritage, this tour offers a perfect blend of rejuvenation and exploration. Stay in premium private pool villas in Ubud and beachfront luxury resorts in Seminyak, accompanied by private guided sightseeing.",
+    overview: "Experience the ultimate tropical getaway in Bali, the Island of the Gods. Famous for its volcanic mountains, iconic rice paddies, sandy beaches, and vibrant cultural heritage, this tour offers a perfect blend of rejuvenation and exploration. Stay in premium beachfront resorts and luxury properties, accompanied by private guided sightseeing.",
     highlights: [
-      "Stay in a luxury Ubud Private Pool Villa & Seminyak beach resort",
-      "Guided tour of Tegalalang Rice Terraces and sacred Tirta Empul Temple",
-      "Breathtaking Mount Batur Sunrise Trekking with natural hot springs visit",
-      "Full-day excursion to Nusa Penida island including Kelingking Beach",
-      "Sunset Kecak Dance performance at the cliffside Uluwatu Temple",
-      "Gourmet seafood candlelit dinner on the shores of Jimbaran Bay"
+      "Batubulan Barong Dance & Celuk Silver Village tour",
+      "Mas Wood Carving Village & Ubud Art Market shopping",
+      "Spectacular Tegallalang Rice Terrace & Kintamani Volcano views",
+      "Benoa Beach water sports with a complimentary Banana Boat ride",
+      "Full-day excursion to Nusa Penida Island including Kelingking Beach",
+      "Scenic Ulun Danu Beratan Temple and iconic Handara Gate photo stop"
     ],
     itinerary: [
-      { day: "Day 1", title: "Arrival in Bali & Private Villa Transfer", desc: "Arrive at Ngurah Rai International Airport. Your private chauffeur will receive you and transfer you to your luxury villa in Ubud. Spend the evening relaxing in your private pool." },
-      { day: "Day 2", title: "Ubud Cultural Wonders & Waterfalls", desc: "Visit the stunning Kanto Lampo Waterfall, Tegalalang Rice Terraces, and the sacred water temple of Tirta Empul. Conclude with a traditional Balinese coffee tasting." },
-      { day: "Day 3", title: "Mount Batur Sunrise Trek or Leisure Spa", desc: "Early morning hike up Mt. Batur for a magical sunrise over the clouds. Recover with a dip in volcanic natural hot springs. Alternatively, enjoy an indulgent 3-hour Balinese massage." },
-      { day: "Day 4", title: "Seminyak Beach Club Transfer & Sunset Cruise", desc: "Transfer to Seminyak. Check into a beachfront resort. In the evening, embark on a luxury catamaran sunset cruise with dinner on board." },
-      { day: "Day 5", title: "Nusa Penida Island Day Excursion", desc: "Board a premium speedboat to Nusa Penida. Visit the famous dinosaur-shaped Kelingking Beach, Broken Beach, Angel's Billabong, and enjoy snorkeling with manta rays." },
-      { day: "Day 6", title: "Uluwatu Temple Sunset & Jimbaran Seafood", desc: "Explore the Uluwatu Temple perched on a 70-meter cliff. Watch the dramatic Kecak Fire Dance as the sun sets over the Indian Ocean. Enjoy a seafood dinner on Jimbaran beach." },
-      { day: "Day 7", title: "Leisurely Morning & Departure", desc: "Enjoy a final floating breakfast in your pool. Complete some last-minute souvenir shopping before your private transfer to the airport for your flight back home." }
+      { day: "Day 1", title: "Arrival in Bali", desc: "Arrival at Ngurah Rai International Airport. Meet & greet by our local representative, followed by a private transfer to your hotel. Complete your hotel check-in and spend the evening at leisure. Overnight stay in Bali." },
+      { day: "Day 2", title: "Kintamani Volcano Tour", desc: "After breakfast at the hotel, watch the Batubulan Barong Dance and visit Celuk Silver Village and Mas Wood Carving Village. Explore Ubud Art Market, Tegallalang Rice Terrace, and the Kintamani Volcano view. Complete the day with a local coffee plantation visit. Overnight stay." },
+      { day: "Day 3", title: "Watersports & Uluwatu Temple", desc: "Breakfast at the hotel, then head to Benoa Beach for water sports including a complimentary Banana Boat ride (other water sports optional). Later, visit Padang Padang Beach and Uluwatu Temple, with an optional Kecak Fire Dance show. Overnight stay." },
+      { day: "Day 4", title: "Nusa Penida Island Tour", desc: "Enjoy breakfast, then transfer by fast boat to Nusa Penida. Visit the famous Kelingking Beach, Broken Beach, Angel's Billabong, and Crystal Bay. A delicious lunch is included. Return to Bali in the afternoon. Overnight stay." },
+      { day: "Day 5", title: "Handara Gate & Ulun Danu Temple", desc: "Enjoy breakfast, then visit the iconic Handara Gate and the floating Ulun Danu Beratan Temple. Explore Wanagiri Hidden Hills and spend the rest of the day local shopping. Overnight stay." },
+      { day: "Day 6", title: "Departure", desc: "After breakfast, check out of your hotel. Your private driver will transfer you to Bali International Airport for your departure flight." }
     ],
     inclusions: [
-      "06 Nights accommodation in handpicked 4★/5★ properties",
-      "Daily breakfast (including 1 floating breakfast in villa)",
-      "Airport pick-up and drop-off in a private AC SUV vehicle",
-      "All entrance fees, toll taxes, and parking fees",
-      "Nusa Penida tour with private vehicle and return speedboat tickets",
-      "Mount Batur trekking guide, tickets, and hot springs entry",
-      "English-speaking private guide during sightseeing",
-      "24/7 VIP Concierge support on WhatsApp"
+      "5 Nights Hotel Accommodation",
+      "Daily Breakfast",
+      "Private Airport Transfers",
+      "Private Sightseeing Tours",
+      "English Speaking Driver",
+      "Entrance Tickets (As Per Itinerary)",
+      "Fast Boat for Nusa Penida",
+      "Banana Boat Ride",
+      "All Applicable Taxes"
     ],
     exclusions: [
-      "International flights and travel insurance",
-      "Meals other than breakfast (unless specified in highlights)",
-      "Personal expenses such as laundry, telephone, and spa treatments",
-      "Tipping for driver & guides (recommended USD 5/day)"
+      "Airfare",
+      "Visa (If Applicable)",
+      "Travel Insurance",
+      "Personal Expenses",
+      "Optional Activities",
+      "Lunch & Dinner (Unless Mentioned)",
+      "Tips & Porterage"
     ],
     hotels: [
-      { name: "Alaya Resort Ubud / Kayon Jungle Resort", stars: 5, location: "Ubud" },
-      { name: "The Haven Seminyak / W Bali Seminyak", stars: 5, location: "Seminyak" }
+      { name: "Alaya Resort Ubud / The Haven Seminyak", stars: 5, location: "Ubud & Seminyak, Bali" }
     ],
-    transportation: "Private air-conditioned Toyota Innova/Avanza for land travel, speedboats for island crossings.",
+    transportation: "Private air-conditioned SUV for land travel, speedboats for Nusa Penida island crossing.",
     visaInfo: "Visa on Arrival (VoA) is available for 80+ nationalities (IDR 500,000 / ~USD 35). SkyNow Holiday consultants assist in pre-filling electronic custom declarations.",
     bestTime: "April to October (Dry season with low humidity, clear skies, and gentle breezes).",
     faqs: [
@@ -92,40 +94,55 @@ const destinationDetailsDb: Record<
   "singapore-malaysia": {
     overview: "Explore two of Southeast Asia's most dynamic and modern nations. From Singapore's futuristic Gardens by the Bay and Sentosa Island to Malaysia's historical Kuala Lumpur landmarks and cool Genting Highlands. This twin-nation escape features top-tier luxury hotels, private city transfers, and premium attraction admissions.",
     highlights: [
-      "Access Gardens by the Bay Double Conservatories & Supertree Observatory",
-      "Full-day pass to Universal Studios Singapore with express lane option",
-      "Cable car ride & luxury experiences on Sentosa Island",
-      "Private cross-border luxury limousine transfer from Singapore to KL",
-      "Visit Petronas Twin Towers Skybridge and Genting Highlands",
-      "Batu Caves excursion and Kuala Lumpur night city tour"
+      "Stay in Genting Highlands, Kuala Lumpur, and Singapore",
+      "Full-day pass to Universal Studios Singapore and Sentosa Island Tour",
+      "KL Tower Observation Deck tickets and Batu Caves excursion",
+      "Scenic Genting Awana Skyway two-way cable car ride",
+      "Guided city tours of Kuala Lumpur and Singapore",
+      "Spectacular Wings of Time show ticket included"
     ],
     itinerary: [
-      { day: "Day 1", title: "Welcome to Singapore & Night Safari", desc: "Arrive at Changi Airport. Transfer to your luxury downtown hotel. In the evening, visit the world-renowned Singapore Night Safari via tram and walking trail." },
-      { day: "Day 2", title: "Gardens by the Bay & City Tour", desc: "Explore the Marina Bay Sands SkyPark and Gardens by the Bay (Flower Dome & Cloud Forest). Afternoon guided city tour covering Merlion Park, Chinatown, and Little India." },
-      { day: "Day 3", title: "Universal Studios & Sentosa Fun", desc: "Enjoy a thrill-filled day at Universal Studios on Resorts World Sentosa. Late afternoon, take a cable car ride and experience the wings of time laser show." },
-      { day: "Day 4", title: "Cross-Border Transfer to Kuala Lumpur", desc: "After breakfast, check out. A private luxury VIP vehicle will transport you across the border directly to your hotel in Kuala Lumpur." },
-      { day: "Day 5", title: "KL City Wonders & Petronas Skybridge", desc: "Explore KL. Visit the King's Palace, National Mosque, and walk the skybridge of the iconic Petronas Twin Towers. Spend the night dining at Bukit Bintang." },
-      { day: "Day 6", title: "Batu Caves & Genting Highlands", desc: "Drive to the giant golden Murugan statue at Batu Caves. Climb the 272 colorful stairs. Continue up to Genting Highlands via Awana Skyway cable car. Visit the indoor/outdoor theme parks." },
-      { day: "Day 7", title: "Putrajaya Tour & Departure", desc: "Check out. Enjoy a brief tour of Putrajaya, Malaysia's administrative center, with its rose-colored dome mosque. Transfer to KLIA airport for your return flight." }
+      { day: "Day 1", title: "Arrival in Kuala Lumpur – Genting Highlands", desc: "Morning arrival at Kuala Lumpur International Airport. Meet and greet by our local representative, then transfer to Genting Highlands. Enjoy a scenic two-way cable car ride. Complete hotel check-in and spend the evening exploring Genting Highlands. Overnight stay in Genting Highlands." },
+      { day: "Day 2", title: "Genting Highlands – Kuala Lumpur", desc: "Breakfast at the hotel, followed by a visit to Genting SkyWorlds Theme Park. Transfer to Kuala Lumpur and check into your hotel. Spend the evening at leisure or shopping. Overnight stay in Kuala Lumpur." },
+      { day: "Day 3", title: "Kuala Lumpur City Tour", desc: "Breakfast at the hotel, then proceed for a Kuala Lumpur City Tour. Visit Petronas Twin Towers (photo stop), KL Tower Observation Deck, King's Palace (photo stop), National Mosque (drive pass), Independence Square, and the Chocolate Boutique. Visit the famous Batu Caves before returning to the hotel. Overnight stay in Kuala Lumpur." },
+      { day: "Day 4", title: "Kuala Lumpur to Singapore", desc: "Enjoy breakfast at the hotel, check out, and transfer to Singapore by coach or flight. Complete hotel check-in in Singapore and enjoy the evening at leisure. Overnight stay in Singapore." },
+      { day: "Day 5", title: "Singapore City Tour & Sentosa Island", desc: "Breakfast at the hotel, followed by a Singapore City Tour. Visit Merlion Park, Marina Bay Sands (photo stop), and drive through the Civic District. Visit Chinatown and Little India. In the afternoon, enjoy a Sentosa Island Tour and watch the spectacular Wings of Time show. Overnight stay in Singapore." },
+      { day: "Day 6", title: "Universal Studios Singapore", desc: "Enjoy breakfast at the hotel, then spend a full day of excitement at Universal Studios Singapore. Return to the hotel for an overnight stay." },
+      { day: "Day 7", title: "Departure", desc: "Breakfast at the hotel, check out, and transfer to Singapore Changi Airport for your departure with sweet memories." }
     ],
     inclusions: [
-      "03 Nights in Singapore & 03 Nights in Kuala Lumpur (4★ / 5★)",
-      "Daily international buffet breakfast",
-      "Private transfers for all sightseeing and airports",
-      "Private cross-border limousine transfer (Singapore to KL)",
-      "Tickets for: Gardens by the Bay, Night Safari, Universal Studios, Petronas Towers, Genting Cable Car",
-      "All Malaysian tourism tax (TTX)"
+      "1 Night Accommodation in Genting Highlands",
+      "2 Nights Accommodation in Kuala Lumpur",
+      "3 Nights Accommodation in Singapore",
+      "Daily Breakfast",
+      "Airport Transfers",
+      "Two-Way Genting Cable Car Ride",
+      "Kuala Lumpur City Tour",
+      "KL Tower Observation Deck Ticket",
+      "Batu Caves Visit",
+      "Singapore City Tour",
+      "Sentosa Island Tour",
+      "Wings of Time Show",
+      "Universal Studios Singapore Admission Ticket",
+      "English Speaking Driver/Guide",
+      "All Applicable Taxes"
     ],
     exclusions: [
-      "Airfares and visa fees",
-      "Optional tours or items not mentioned in the itinerary",
-      "Personal items, laundry, telephone calls"
+      "International Airfare",
+      "Visa Charges",
+      "Travel Insurance",
+      "Lunch & Dinner (Unless Mentioned)",
+      "Personal Expenses",
+      "Optional Tours & Activities",
+      "Tips & Porterage",
+      "Early Check-in / Late Check-out (if applicable)"
     ],
     hotels: [
-      { name: "Marina Bay Sands / Pan Pacific", stars: 5, location: "Singapore" },
-      { name: "EQ Kuala Lumpur / Shangri-La KL", stars: 5, location: "Kuala Lumpur" }
+      { name: "Resorts World Genting / Crockfords", stars: 5, location: "Genting Highlands" },
+      { name: "EQ Kuala Lumpur / Shangri-La KL", stars: 5, location: "Kuala Lumpur" },
+      { name: "Marina Bay Sands / Pan Pacific", stars: 5, location: "Singapore" }
     ],
-    transportation: "Private VIP executive MVP transfer across countries; private private luxury sedan/SUV for local transit.",
+    transportation: "Private air-conditioned transfers for airports and tours; two-way Genting cable car ride.",
     visaInfo: "Singapore requires SG Arrival Card (completed within 3 days). Malaysia requires MDAC (Malaysia Digital Arrival Card). Visas for both are processed efficiently by SkyNow.",
     bestTime: "November to August (year-round tropical climate, though dry months are highly comfortable).",
     faqs: [
@@ -178,10 +195,58 @@ const destinationDetailsDb: Record<
   }
 };
 
+const categoryPools: Record<string, string[]> = {
+  Beach: [
+    "photo-1507525428034-b723cf961d3e",
+    "photo-1506929562872-bb421503ef21",
+    "photo-1439066615861-d1af74d74000",
+    "photo-1519046904884-53103b34b206",
+    "photo-1473116763269-255ea7604bb6",
+    "photo-1520250497591-112f2f40a3f4",
+  ],
+  Honeymoon: [
+    "photo-1520250497591-112f2f40a3f4",
+    "photo-1571896349842-33c89424de2d",
+    "photo-1540555700478-4be289fbecef",
+    "photo-1584132967334-10e028bd69f7",
+    "photo-1512917774080-9991f1c4c750",
+    "photo-1544161515-4ab6ce6db874",
+  ],
+  Luxury: [
+    "photo-1571896349842-33c89424de2d",
+    "photo-1512917774080-9991f1c4c750",
+    "photo-1544161515-4ab6ce6db874",
+    "photo-1566073771259-6a8506099945",
+    "photo-1582719508461-905c673771fd",
+    "photo-1520250497591-112f2f40a3f4",
+  ],
+  Adventure: [
+    "photo-1469854523086-cc02fe5d8800",
+    "photo-1533240332313-0db49b439ad3",
+    "photo-1501555088652-021faa106b9b",
+    "photo-1504280390367-361c6d9f38f4",
+    "photo-1486916856992-e4db22c8df33",
+    "photo-1527631746610-bca00a040d60",
+  ],
+  Default: [
+    "photo-1488646953014-85cb44e25828",
+    "photo-1488085061387-422e29b40080",
+    "photo-1501785888041-af3ef285b470",
+    "photo-1476514525535-07fb3b4ae5f1",
+    "photo-1527631746610-bca00a040d60",
+    "photo-1498307818610-a3a9202012d6",
+  ]
+};
+
 // Fallback generator for destinations that do not have specific overrides in the DB
-function generateFallbackDetails(d: Destination): typeof destinationDetailsDb[string] {
+export function generateFallbackDetails(d: Destination): typeof destinationDetailsDb[string] & { images: string[] } {
   const name = d.name;
   const country = d.country;
+  const pool = categoryPools[d.tag] || categoryPools.Default;
+  const fallbackImages = [
+    d.image,
+    ...pool.map(id => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&q=80`)
+  ].slice(0, 6);
   return {
     overview: `Embark on an unforgettable journey to ${name}, ${country}. This custom package has been designed to highlight the very best of ${name}'s culture, landscapes, and luxury amenities. Backed by SkyNow Holidays' signature 24/7 concierge and expert destination planning, you will experience the trip of a lifetime.`,
     highlights: [
@@ -224,76 +289,41 @@ function generateFallbackDetails(d: Destination): typeof destinationDetailsDb[st
     faqs: [
       { q: `What language is spoken in ${name}?`, a: `While the national language is spoken locally, English is widely spoken and understood in hotels, tourist attractions, and key shopping centers.` },
       { q: `Can this itinerary be customized?`, a: `Absolutely! All SkyNow Holidays packages are 100% customizable. You can adjust durations, swap hotels, add activities, or combine this with other destinations.` }
-    ]
+    ],
+    images: fallbackImages
   };
 }
 
 // Main fetcher function for package details
 export function getPackageDetails(slug: string): PackageDetails | null {
-  const match = destinations.find((d) => getSlug(d.name) === slug);
+  const { getStoreData } = import.meta.glob("@/lib/dataStore", { eager: true })["/src/lib/dataStore.ts"] as any;
+  const store = getStoreData();
+  
+  const match = store.destinations.find((d: any) => getSlug(d.name) === slug);
   if (!match) return null;
 
-  const dbData = destinationDetailsDb[slug] || generateFallbackDetails(match);
+  const dbData = store.destinationDetailsDb[slug] || generateFallbackDetails(match);
 
-  const categoryPools: Record<string, string[]> = {
-    Beach: [
-      "photo-1507525428034-b723cf961d3e",
-      "photo-1506929562872-bb421503ef21",
-      "photo-1439066615861-d1af74d74000",
-      "photo-1519046904884-53103b34b206",
-      "photo-1473116763269-255ea7604bb6",
-      "photo-1520250497591-112f2f40a3f4",
-    ],
-    Honeymoon: [
-      "photo-1520250497591-112f2f40a3f4",
-      "photo-1571896349842-33c89424de2d",
-      "photo-1540555700478-4be289fbecef",
-      "photo-1584132967334-10e028bd69f7",
-      "photo-1512917774080-9991f1c4c750",
-      "photo-1544161515-4ab6ce6db874",
-    ],
-    Luxury: [
-      "photo-1571896349842-33c89424de2d",
-      "photo-1512917774080-9991f1c4c750",
-      "photo-1544161515-4ab6ce6db874",
-      "photo-1566073771259-6a8506099945",
-      "photo-1582719508461-905c673771fd",
-      "photo-1520250497591-112f2f40a3f4",
-    ],
-    Adventure: [
-      "photo-1469854523086-cc02fe5d8800",
-      "photo-1533240332313-0db49b439ad3",
-      "photo-1501555088652-021faa106b9b",
-      "photo-1504280390367-361c6d9f38f4",
-      "photo-1486916856992-e4db22c8df33",
-      "photo-1527631746610-bca00a040d60",
-    ],
-    Default: [
-      "photo-1488646953014-85cb44e25828",
-      "photo-1488085061387-422e29b40080",
-      "photo-1501785888041-af3ef285b470",
-      "photo-1476514525535-07fb3b4ae5f1",
-      "photo-1527631746610-bca00a040d60",
-      "photo-1498307818610-a3a9202012d6",
-    ]
-  };
+
 
   const pool = categoryPools[match.tag] || categoryPools.Default;
-  const extraImages = [
-    match.image,
-    ...pool.map(id => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&q=80`)
-  ].slice(0, 6);
+  const extraImages = dbData.images && dbData.images.length > 0
+    ? dbData.images
+    : [
+        match.image,
+        ...pool.map(id => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&q=80`)
+      ].slice(0, 6);
 
   // Dynamic recommendation logic: select 3 packages of the same category, or closest in order
-  const related = destinations
-    .filter((d) => d.name !== match.name)
-    .sort((a, b) => {
+  const related = store.destinations
+    .filter((d: any) => d.name !== match.name)
+    .sort((a: any, b: any) => {
       if (a.tag === match.tag && b.tag !== match.tag) return -1;
       if (a.tag !== match.tag && b.tag === match.tag) return 1;
       return 0;
     })
     .slice(0, 3)
-    .map((d) => getSlug(d.name));
+    .map((d: any) => getSlug(d.name));
 
   return {
     ...match,

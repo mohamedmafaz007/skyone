@@ -1,28 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Award, Compass, HeartHandshake, ShieldCheck, Star, Users } from "lucide-react";
+import { Compass, ShieldCheck } from "lucide-react";
 import CommonHero from "@/components/skynow/CommonHero";
+import { useAppData } from "@/lib/dataStore";
 
 export const Route = createFileRoute("/about")({
   component: AboutPage,
 });
 
-const TIMELINE = [
-  { year: "2010", title: "Foundation", desc: "SkyNow Holidays is founded in Bengaluru as a boutique corporate retreat planner (MICE), starting with a small team of 3 specialists." },
-  { year: "2014", title: "Global Expansion", desc: "Launched leisure travel services, curating customized FIT (Free Independent Traveler) tours to Southeast Asia and Europe." },
-  { year: "2018", title: "Milestone: 5,000 Travellers", desc: "Recognized as a fast-growing travel studio, assisting over 5,000 travellers and expanding our destination footprint to 15+ countries." },
-  { year: "2021", title: "The 24/7 Concierge Revolution", desc: "Introduced our signature round-the-clock WhatsApp support team, ensuring travellers have an expert host in any timezone." },
-  { year: "2025", title: "Boutique Agency of the Year", desc: "Winner of the National Luxury Travel Awards. Serving 10,000+ happy holidaymakers with a consistent 4.9/5 star Google rating." },
-] as const;
-
-const TEAM = [
-  { name: "Rohit Sen", role: "Founder & Chief Explorer", bio: "Ex-airline director with 20+ years in premium aviation. Rohit curates our high-end luxury resort connections.", avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&q=80" },
-  { name: "Shalini Nair", role: "Co-Founder & COO", bio: "Hospitality veteran obsessed with operations. Shalini manages our visa compliance and emergency assistance teams.", avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80" },
-  { name: "Vikram Malhotra", role: "Head of Europe Planning", bio: "Has personally travelled to 42 countries. Vikram designs all of our Switzerland, Paris, and Italy itineraries.", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80" },
-  { name: "Rhea Iyer", role: "Honeymoon & Leisure Specialist", bio: "Bespoke beach holiday expert. Rhea specializes in over-water villas in Mauritius, Maldives, and private Ubud hideaways.", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80" },
-] as const;
-
 function AboutPage() {
+  const { about } = useAppData();
   return (
     <div className="bg-background pb-20">
       <CommonHero
@@ -41,15 +28,11 @@ function AboutPage() {
             transition={{ duration: 0.8 }}
           >
             <span className="text-xs font-bold uppercase tracking-[0.3em] text-brand">Our Story</span>
-            <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">
-              We don't sell packages. <br />
-              <span className="italic text-gradient-brand">We design journeys.</span>
+            <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl leading-tight">
+              {about.storyTitle}
             </h2>
-            <p className="mt-6 text-sm leading-relaxed text-muted-foreground sm:text-base">
-              SkyNow Holidays was born out of a simple frustration: travel had become transactional. Large portals offered standardized packages, leaving travellers stranded with cookie-cutter plans and computerized chatbots when things went off-track.
-            </p>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
-              We decided to do things differently. We built a boutique travel studio focused on customization, vetted partner properties, and high-touch human service. Every itinerary we design starts with a conversation and ends with a lifetime memory.
+            <p className="mt-6 text-sm leading-relaxed text-muted-foreground sm:text-base whitespace-pre-line">
+              {(about.storyParagraphs || []).join("\n\n")}
             </p>
             <div className="mt-8 grid grid-cols-2 gap-4">
               <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
@@ -136,7 +119,7 @@ function AboutPage() {
         </div>
 
         <div className="relative mt-16 before:absolute before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-border md:before:left-1/2">
-          {TIMELINE.map((item, idx) => {
+          {about.timeline.map((item: any, idx: number) => {
             const isLeft = idx % 2 === 0;
             return (
               <div key={item.year} className="relative mb-12 flex flex-col md:flex-row items-start md:items-center">
@@ -182,7 +165,7 @@ function AboutPage() {
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {TEAM.map((member, i) => (
+            {about.team.map((member: any, i: number) => (
               <motion.div
                 key={member.name}
                 initial={{ opacity: 0, y: 30 }}

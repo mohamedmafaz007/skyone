@@ -31,7 +31,7 @@ export default function FloatingActions() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.7, y: 15 }}
             transition={{ duration: 0.2 }}
-            href="https://wa.me/911234567890?text=Hello%20SkyNow%20Holidays%2C%20I%20would%20like%20to%20inquire%20about%20your%20international%20tour%20packages."
+            href="https://wa.me/917639277770?text=Hello%20SkyNow%20Holidays%2C%20I%20would%20like%20to%20inquire%20about%20your%20international%20tour%20packages."
             target="_blank"
             rel="noreferrer"
             className="fixed bottom-24 right-6 z-40 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-luxury transition-all duration-300 hover:scale-110 hover:shadow-2xl"

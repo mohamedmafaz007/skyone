@@ -53,7 +53,7 @@ function PrivacyPolicyPage() {
 
           <h2 className="font-display text-2xl font-bold text-ink">6. Contact Our Compliance Team</h2>
           <p>
-            For questions regarding personal database registers or request records deletes, please email us directly at <a href="mailto:privacy@skynowholidays.com" className="text-brand font-bold underline">privacy@skynowholidays.com</a>.
+            For questions regarding personal database registers or request records deletes, please email us directly at <a href="mailto:privacy@skynowhollidays.com" className="text-brand font-bold underline">privacy@skynowhollidays.com</a>.
           </p>
         </div>
       </section>

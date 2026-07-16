@@ -1,0 +1,90 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Destination {
+  id             String   @id @default(uuid())
+  name           String   @unique
+  country        String
+  tag            String   // Honeymoon, Beach, Luxury, Adventure, etc.
+  image          String   // Main Cover Image URL
+  blurb          String   // Short 1-sentence description
+  duration       String   // e.g. "5N / 6D"
+  price          String   // e.g. "₹58,900"
+  rating         Float    @default(4.8)
+  overview       String   @db.Text
+  highlights     Json     // Array of strings (e.g. ["Highlight 1", "Highlight 2"])
+  inclusions     Json     // Array of strings
+  exclusions     Json     // Array of strings
+  hotels         Json     // Array of hotel objects (e.g. [{"name": "Hotel A", "stars": 5, "location": "Ubud"}])
+  transportation String?  @db.Text
+  visaInfo       String?  @db.Text
+  bestTime       String?  @db.Text
+  faqs           Json     // Array of FAQ objects (e.g. [{"q": "Question?", "a": "Answer"}])
+  images         Json     // Array of extra image URLs
+  packages       Package[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Package {
+  id             String   @id @default(uuid())
+  name           String
+  price          String
+  duration       String
+  overview       String   @db.Text
+  highlights     Json     // Array of strings
+  inclusions     Json     // Array of strings
+  exclusions     Json     // Array of strings
+  transportation String?  @db.Text
+  visaInfo       String?  @db.Text
+  bestTime       String?  @db.Text
+  hotels         Json?    // Optional: custom hotel list (override destination level hotels)
+  destinationId  String?
+  destination    Destination? @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  itineraries    DayItinerary[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model DayItinerary {
+  id          String   @id @default(uuid())
+  day         String   // e.g. "Day 1", "Day 2"
+  title       String
+  desc        String   @db.Text
+  packageId   String
+  package     Package  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PageContent {
+  key       String   @id // e.g. "home", "about", "services", "gallery", "testimonials", "faqs", "contact"
+  content   Json
+  updatedAt DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  message   String   @db.Text
+  timestamp DateTime @default(now())
+  read      Boolean  @default(false)
+}

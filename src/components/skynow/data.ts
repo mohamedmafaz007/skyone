@@ -1,5 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import cambodiaImage from "@/assets/cambodia.png";
+import bhutanImage from "@/assets/bhutan.png";
+import srilankaImage from "@/assets/srilanka.png";
 import {
   Award,
   BadgeCheck,
@@ -35,8 +37,8 @@ const u = (id: string, w = 1200) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
 
 export const destinations: Destination[] = [
-  { name: "Bali", country: "Indonesia", tag: "Honeymoon", image: u("photo-1537996194471-e657df975ab4"), blurb: "Emerald rice terraces, temple sunsets & barefoot luxury villas.", duration: "6N / 7D", price: "₹58,900", rating: 4.9 },
-  { name: "Singapore & Malaysia", country: "SG • MY", tag: "Family", image: u("photo-1525625293386-3f8f99389edd"), blurb: "Twin-city skyline escapes with Sentosa, Genting & Petronas.", duration: "7N / 8D", price: "₹74,500", rating: 4.8 },
+  { name: "Bali", country: "Indonesia", tag: "Honeymoon", image: u("photo-1537996194471-e657df975ab4"), blurb: "Emerald rice terraces, temple sunsets & barefoot luxury villas.", duration: "5N / 6D", price: "₹58,900", rating: 4.9 },
+  { name: "Singapore & Malaysia", country: "SG • MY", tag: "Family", image: u("photo-1525625293386-3f8f99389edd"), blurb: "Twin-city skyline escapes with Sentosa, Genting & Petronas.", duration: "6N / 7D", price: "₹74,500", rating: 4.8 },
   { name: "Dubai", country: "UAE", tag: "Luxury", image: u("photo-1512453979798-5ea266f8880c"), blurb: "Desert dunes, Burj Khalifa & yacht sundowners on the Marina.", duration: "5N / 6D", price: "₹69,900", rating: 4.9 },
   { name: "Thailand", country: "Bangkok • Phuket", tag: "Beach", image: u("photo-1552465011-b4e21bf6e79a"), blurb: "Long-tail boats, floating markets & Andaman island hopping.", duration: "6N / 7D", price: "₹49,900", rating: 4.7 },
   { name: "Vietnam", country: "Hanoi • Ha Long", tag: "Adventure", image: u("photo-1528127269322-539801943592"), blurb: "Emerald bays, cave kayaking & the old quarters of Hanoi.", duration: "7N / 8D", price: "₹64,000", rating: 4.8 },
@@ -44,8 +46,8 @@ export const destinations: Destination[] = [
   { name: "China", country: "Beijing • Shanghai", tag: "International", image: u("photo-1508804185872-d7badad00f7d"), blurb: "The Great Wall, Forbidden City & The Bund's neon skyline.", duration: "8N / 9D", price: "₹1,05,000", rating: 4.7 },
   { name: "Hong Kong & Macau", country: "HK • MO", tag: "Family", image: u("photo-1536599018102-9f803c140fc1"), blurb: "Sky-high dim sum, Disney magic & the Venetian's grand canals.", duration: "5N / 6D", price: "₹78,500", rating: 4.7 },
   { name: "Nepal", country: "Kathmandu • Pokhara", tag: "Adventure", image: u("photo-1544735716-392fe2489ffa"), blurb: "Himalayan sunrises, prayer flags & lakeside Pokhara.", duration: "5N / 6D", price: "₹42,000", rating: 4.8 },
-  { name: "Bhutan", country: "Paro • Thimphu", tag: "Adventure", image: u("photo-1587547742929-e69cae0cf4a5"), blurb: "Tiger's Nest monastery & the kingdom of Gross National Happiness.", duration: "6N / 7D", price: "₹67,000", rating: 4.9 },
-  { name: "Sri Lanka", country: "Colombo • Kandy", tag: "Family", image: u("photo-1546708770-599a3ba7de3c"), blurb: "Tea trails, temple of the tooth & southern palm beaches.", duration: "6N / 7D", price: "₹46,500", rating: 4.7 },
+  { name: "Bhutan", country: "Paro • Thimphu", tag: "Adventure", image: bhutanImage, blurb: "Tiger's Nest monastery & the kingdom of Gross National Happiness.", duration: "6N / 7D", price: "₹67,000", rating: 4.9 },
+  { name: "Sri Lanka", country: "Colombo • Kandy", tag: "Family", image: srilankaImage, blurb: "Tea trails, temple of the tooth & southern palm beaches.", duration: "6N / 7D", price: "₹46,500", rating: 4.7 },
   { name: "Bahrain", country: "Manama", tag: "Luxury", image: u("photo-1548013146-72479768bada"), blurb: "Pearl diving heritage, modern skyline & Formula 1 flair.", duration: "4N / 5D", price: "₹56,000", rating: 4.6 },
   { name: "Baku Azerbaijan", country: "Baku", tag: "International", image: u("photo-1547448415-e9f5b28e570d"), blurb: "Flame Towers, Old City walls & Caspian coast promenades.", duration: "5N / 6D", price: "₹61,500", rating: 4.7 },
   { name: "Turkey", country: "Istanbul • Cappadocia", tag: "Honeymoon", image: u("photo-1524231757912-21f4fe3a7200"), blurb: "Hot-air balloons at dawn over fairy chimneys.", duration: "7N / 8D", price: "₹89,000", rating: 4.9 },

@@ -16,6 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Facebook,
+  Globe,
   Instagram,
   Linkedin,
   Mail,
@@ -25,6 +26,7 @@ import {
   PlaneTakeoff,
   Search,
   Send,
+  Sparkles,
   Star,
   Users,
   X,
@@ -33,17 +35,8 @@ import {
 import heroBg from "@/assets/hero-bg.jpg";
 import logoImage from "@/assets/FINAL-removebg-preview.png";
 import { getSlug } from "./packageDetailsData";
-import {
-  destinations,
-  features,
-  galleryImages,
-  faqs,
-  stats,
-  testimonials,
-  trustBadges,
-  partnerLogos,
-  type Destination,
-} from "./data";
+import { type Destination } from "./data";
+import { useAppData, IconMap } from "@/lib/dataStore";
 
 /* ---------------- Utility hooks ---------------- */
 function useCounter(target: number, inView: boolean, duration = 1800) {
@@ -182,6 +175,7 @@ function Hero() {
   const containerRef = useRef(null);
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 800], [0, 240]);
+  const { destinations, home, addMessage } = useAppData();
 
   // Form State
   const [sent, setSent] = useState(false);
@@ -195,8 +189,25 @@ function Hero() {
 
   const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    addMessage({
+      name: form.name,
+      phone: form.whatsapp,
+      email: "N/A (Form: Plan Your Trip)",
+      destination: form.destination,
+      service: form.tripType,
+      travelDate: form.month,
+      guests: "Not Specified",
+      message: "Plan Your Trip inquiry submitted from homepage Hero form."
+    });
     setSent(true);
     setTimeout(() => setSent(false), 4000);
+    setForm({
+      destination: "",
+      tripType: "",
+      name: "",
+      whatsapp: "",
+      month: ""
+    });
   };
 
   return (
@@ -206,11 +217,22 @@ function Hero() {
     >
       {/* Background Parallax */}
       <motion.div style={{ y }} className="absolute inset-0 h-[110%] w-full">
-        <img
-          src={heroBg}
-          alt="Luxury travel view"
-          className="h-full w-full object-cover opacity-60"
-        />
+        {home.hero.bgType === "video" ? (
+          <video
+            src={home.hero.bgUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="h-full w-full object-cover opacity-60"
+          />
+        ) : (
+          <img
+            src={home.hero.bgUrl || heroBg}
+            alt="Luxury travel view"
+            className="h-full w-full object-cover opacity-60"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-ink/30 via-ink/40 to-[oklch(0.12_0.03_265)]" />
       </motion.div>
 
@@ -225,12 +247,12 @@ function Hero() {
           <div className="max-w-2xl text-left">
             {/* Heading */}
             <Reveal delay={0.1}>
-              <h1 className="mt-6 font-display text-5xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl">
-                Explore the World with <br />
-                <span className="font-serif italic font-normal text-gradient-gold">
-                  SkyNow Holidays.
-                </span>
+              <h1 className="mt-6 font-display text-5xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl leading-tight">
+                {home.hero.title}
               </h1>
+              <p className="mt-6 text-sm sm:text-base text-white/80 leading-relaxed max-w-xl">
+                {home.hero.subtitle}
+              </p>
             </Reveal>
 
             {/* CTAs */}
@@ -490,30 +512,33 @@ function SearchField({
 
 /* ---------------- Trust Section ---------------- */
 function TrustSection() {
+  const { home } = useAppData();
   return (
     <section id="trust" className="relative bg-white py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <Reveal>
           <p className="text-center text-xs uppercase tracking-[0.4em] text-brand">
-            Trusted worldwide
+            {home.trustSection?.tagline || "Trusted worldwide"}
           </p>
           <h2 className="mx-auto mt-3 max-w-3xl text-center text-3xl font-semibold text-ink sm:text-4xl">
-            Trusted by thousands of{" "}
-            <span className="text-gradient-brand">happy travellers</span>
+            {home.trustSection?.title || "Trusted by thousands of happy travellers"}
           </h2>
         </Reveal>
 
         <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {trustBadges.map((b, i) => (
-            <Reveal key={b.label} delay={i * 0.05}>
-              <div className="group flex h-full flex-col items-center gap-3 rounded-3xl border border-border bg-white p-6 text-center transition hover:-translate-y-1 hover:border-brand/30 hover:shadow-luxury">
-                <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-brand to-[oklch(0.65_0.22_245)] text-white shadow-md transition group-hover:scale-110">
-                  <b.icon className="h-6 w-6" />
-                </span>
-                <p className="text-sm font-semibold text-ink">{b.label}</p>
-              </div>
-            </Reveal>
-          ))}
+          {home.trustBadges.map((b: any, i: number) => {
+            const IconComponent = IconMap[b.icon] || Star;
+            return (
+              <Reveal key={b.label} delay={i * 0.05}>
+                <div className="group flex h-full flex-col items-center gap-3 rounded-3xl border border-border bg-white p-6 text-center transition hover:-translate-y-1 hover:border-brand/30 hover:shadow-luxury">
+                  <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-brand to-[oklch(0.65_0.22_245)] text-white shadow-md transition group-hover:scale-110">
+                    <IconComponent className="h-6 w-6" />
+                  </span>
+                  <p className="text-sm font-semibold text-ink">{b.label}</p>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -534,9 +559,10 @@ const CATEGORIES = [
 
 function DestinationsSection() {
   const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("All");
+  const { destinations, home } = useAppData();
   const filtered = useMemo(
     () => (cat === "All" ? destinations.slice(0, 6) : destinations.filter((d) => d.tag === cat).slice(0, 6)),
-    [cat]
+    [cat, destinations]
   );
   return (
     <section id="destinations" className="relative bg-secondary py-24">
@@ -544,17 +570,15 @@ function DestinationsSection() {
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <Reveal>
             <p className="text-xs uppercase tracking-[0.4em] text-brand">
-              Popular destinations
+              {home.destinationsSection?.tagline || "Popular destinations"}
             </p>
             <h2 className="mt-3 max-w-2xl font-display text-4xl font-semibold text-ink sm:text-5xl">
-              Handpicked corners of the world,
-              <br />
-              <span className="italic text-gradient-brand">worth every mile.</span>
+              {home.destinationsSection?.title || "Handpicked corners of the world, worth every mile."}
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
             <p className="max-w-md text-muted-foreground">
-              From honeymoons in Bali to safaris in Kenya — 22+ international itineraries designed by specialists who've been there.
+              {home.destinationsSection?.description || "From honeymoons in Bali to safaris in Kenya — 22+ international itineraries designed by specialists who've been there."}
             </p>
           </Reveal>
         </div>
@@ -584,7 +608,6 @@ function DestinationsSection() {
         </Reveal>
 
         <motion.div
-          layout
           className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           <AnimatePresence mode="popLayout">
@@ -610,7 +633,7 @@ function DestinationsSection() {
 function DestinationCard({ d, i }: { d: Destination; i: number }) {
   return (
     <motion.article
-      layout
+      layout="position"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
@@ -663,6 +686,7 @@ function DestinationCard({ d, i }: { d: Destination; i: number }) {
 
 /* ---------------- Packages Section (top 6 featured) ---------------- */
 function PackagesSection() {
+  const { destinations, home } = useAppData();
   const featured = destinations.slice(0, 6);
   return (
     <section id="packages" className="relative overflow-hidden bg-white py-24">
@@ -673,11 +697,10 @@ function PackagesSection() {
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-brand">
-                Featured packages
+                {home.packagesSection?.tagline || "Featured packages"}
               </p>
               <h2 className="mt-3 max-w-2xl font-display text-4xl font-semibold text-ink sm:text-5xl">
-                Ready-to-go itineraries,{" "}
-                <span className="italic text-gradient-brand">infinitely customisable.</span>
+                {home.packagesSection?.title || "Ready-to-go itineraries, infinitely customisable."}
               </h2>
             </div>
             <Link to="/packages">
@@ -754,6 +777,7 @@ function PackagesSection() {
 
 /* ---------------- About / Why Choose ---------------- */
 function AboutSection() {
+  const { services, testimonials: testimonialsData, home } = useAppData();
   return (
     <section
       id="about"
@@ -764,7 +788,7 @@ function AboutSection() {
           <div className="relative">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[36px] shadow-luxury">
               <img
-                src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80"
+                src={home.aboutSection?.image || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80"}
                 alt="Traveller looking over the mountains"
                 loading="lazy"
                 className="h-full w-full object-cover"
@@ -774,9 +798,11 @@ function AboutSection() {
               <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
                 Trusted since
               </p>
-              <p className="font-display text-4xl font-semibold text-brand">2010</p>
+              <p className="font-display text-4xl font-semibold text-brand">
+                {home.aboutSection?.sinceYear || "2010"}
+              </p>
               <div className="mt-2 flex -space-x-2">
-                {testimonials.slice(0, 4).map((t) => (
+                {testimonialsData.reviews.slice(0, 4).map((t: any) => (
                   <img
                     key={t.name}
                     src={t.avatar}
@@ -788,8 +814,12 @@ function AboutSection() {
               <p className="mt-2 text-xs text-muted-foreground">10,000+ travellers · 4.9★</p>
             </div>
             <div className="absolute -left-4 top-6 hidden rounded-2xl bg-gold px-4 py-3 text-ink shadow-luxury animate-float sm:block">
-              <p className="text-[10px] uppercase tracking-widest">Best Price</p>
-              <p className="font-display text-lg font-semibold">Guaranteed</p>
+              <p className="text-[10px] uppercase tracking-widest">
+                {home.aboutSection?.badgeLabel || "Best Price"}
+              </p>
+              <p className="font-display text-lg font-semibold">
+                {home.aboutSection?.badgeVal || "Guaranteed"}
+              </p>
             </div>
           </div>
         </Reveal>
@@ -797,32 +827,33 @@ function AboutSection() {
         <div>
           <Reveal>
             <p className="text-xs uppercase tracking-[0.4em] text-brand">
-              Why SkyNow Holidays
+              {home.aboutSection?.tagline || "Why SkyNow Holidays"}
             </p>
             <h2 className="mt-3 font-display text-4xl font-semibold text-ink sm:text-5xl">
-              A boutique travel studio,
-              <br />
-              <span className="italic text-gradient-brand">obsessed with the details.</span>
+              {home.aboutSection?.title || "A boutique travel studio, obsessed with the details."}
             </h2>
             <p className="mt-4 max-w-xl text-muted-foreground">
-              We're a small team of destination specialists, ex-flight crew, and hospitality veterans. We don't do templates — every itinerary is designed around you, and backed by 24/7 human support.
+              {home.aboutSection?.description || "We're a small team of destination specialists, ex-flight crew, and hospitality veterans. We don't do templates — every itinerary is designed around you, and backed by 24/7 human support."}
             </p>
           </Reveal>
 
           <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {features.slice(0, 8).map((f, i) => (
-              <Reveal key={f.title} delay={i * 0.04}>
-                <div className="group flex gap-3 rounded-2xl border border-border bg-white p-4 transition hover:-translate-y-1 hover:border-brand/40 hover:shadow-md">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand transition group-hover:bg-brand group-hover:text-white">
-                    <f.icon className="h-5 w-5" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-ink">{f.title}</p>
-                    <p className="text-xs text-muted-foreground">{f.desc}</p>
+            {services.slice(0, 8).map((f: any, i: number) => {
+              const IconComponent = IconMap[f.icon] || Sparkles;
+              return (
+                <Reveal key={f.title} delay={i * 0.04}>
+                  <div className="group flex gap-3 rounded-2xl border border-border bg-white p-4 transition hover:-translate-y-1 hover:border-brand/40 hover:shadow-md">
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand transition group-hover:bg-brand group-hover:text-white">
+                      <IconComponent className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-ink">{f.title}</p>
+                      <p className="text-xs text-muted-foreground">{f.desc}</p>
+                    </div>
                   </div>
-                </div>
-              </Reveal>
-            ))}
+                </Reveal>
+              );
+            })}
           </div>
 
           <Reveal delay={0.2} className="mt-8">
@@ -859,11 +890,12 @@ function Stat({ value, suffix, label }: { value: number; suffix: string; label: 
   );
 }
 function StatsSection() {
+  const { home } = useAppData();
   return (
     <section className="relative overflow-hidden bg-[oklch(0.15_0.05_265)] py-20 text-white">
       <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
       <div className="relative mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 sm:px-6 lg:grid-cols-4">
-        {stats.map((s) => (
+        {home.stats.map((s: any) => (
           <Stat key={s.label} {...s} />
         ))}
       </div>
@@ -874,9 +906,15 @@ function StatsSection() {
 /* ---------------- Gallery Preview ---------------- */
 function Gallery() {
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const { galleryImages: galleryItems, home } = useAppData();
+  const travelDiaries = home?.travelDiaries || {};
+  const diariesImages = travelDiaries.images && travelDiaries.images.length > 0
+    ? travelDiaries.images
+    : galleryItems.map((item: any) => item.url);
 
-  const row1 = galleryImages.slice(0, 6);
-  const row2 = galleryImages.slice(6, 12);
+  const half = Math.ceil(diariesImages.length / 2);
+  const row1 = diariesImages.slice(0, half);
+  const row2 = diariesImages.slice(half);
 
   return (
     <section id="gallery" className="bg-white py-24 overflow-hidden">
@@ -884,17 +922,15 @@ function Gallery() {
         <Reveal>
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-brand">
-                Travel diaries
+              <p className="text-xs uppercase tracking-[0.4em] text-brand font-bold">
+                {travelDiaries.tagline || "Travel diaries"}
               </p>
-              <h2 className="mt-3 font-display text-4xl font-semibold text-ink sm:text-5xl">
-                Moments from our
-                <br />
-                <span className="italic text-gradient-brand">travellers' cameras.</span>
+              <h2 className="mt-3 font-display text-4xl font-semibold text-ink sm:text-5xl leading-tight">
+                {travelDiaries.title || "Moments from our travellers' cameras."}
               </h2>
             </div>
             <p className="max-w-md text-muted-foreground">
-              Real photos from real trips. Every frame here started as an enquiry — could yours be next?
+              {travelDiaries.description || "Real photos from real trips. Every frame here started as an enquiry — could yours be next?"}
             </p>
           </div>
         </Reveal>
@@ -903,46 +939,50 @@ function Gallery() {
       {/* Sliding photo marquees - moves and pauses on hover */}
       <div className="mt-12 space-y-6">
         {/* Row 1: Right to Left */}
-        <div className="group overflow-hidden py-2">
-          <div className="flex w-max animate-marquee gap-4 pr-4 group-hover:[animation-play-state:paused]">
-            {[...row1, ...row1, ...row1].map((src, idx) => (
-              <button
-                key={src + "-r1-" + idx}
-                onClick={() => setLightbox(src)}
-                className="relative h-48 w-72 sm:h-56 sm:w-80 overflow-hidden rounded-3xl cursor-pointer shrink-0 shadow-md transition duration-500 hover:scale-102 hover:shadow-lg hover:border hover:border-gold/30"
-              >
-                <img
-                  src={src}
-                  alt="Traveller snapshot"
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-[800ms] hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
-              </button>
-            ))}
+        {row1.length > 0 && (
+          <div className="group overflow-hidden py-2">
+            <div className="flex w-max animate-marquee gap-4 pr-4 group-hover:[animation-play-state:paused]">
+              {[...row1, ...row1, ...row1].map((src, idx) => (
+                <button
+                  key={src + "-r1-" + idx}
+                  onClick={() => setLightbox(src)}
+                  className="relative h-48 w-72 sm:h-56 sm:w-80 overflow-hidden rounded-3xl cursor-pointer shrink-0 shadow-md transition duration-500 hover:scale-102 hover:shadow-lg hover:border hover:border-gold/30"
+                >
+                  <img
+                    src={src}
+                    alt="Traveller snapshot"
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-[800ms] hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Row 2: Left to Right (Reverse direction marquee) */}
-        <div className="group overflow-hidden py-2">
-          <div className="flex w-max animate-marquee-reverse gap-4 pr-4 group-hover:[animation-play-state:paused]">
-            {[...row2, ...row2, ...row2].map((src, idx) => (
-              <button
-                key={src + "-r2-" + idx}
-                onClick={() => setLightbox(src)}
-                className="relative h-48 w-72 sm:h-56 sm:w-80 overflow-hidden rounded-3xl cursor-pointer shrink-0 shadow-md transition duration-500 hover:scale-102 hover:shadow-lg hover:border hover:border-gold/30"
-              >
-                <img
-                  src={src}
-                  alt="Traveller snapshot"
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-[800ms] hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
-              </button>
-            ))}
+        {row2.length > 0 && (
+          <div className="group overflow-hidden py-2">
+            <div className="flex w-max animate-marquee-reverse gap-4 pr-4 group-hover:[animation-play-state:paused]">
+              {[...row2, ...row2, ...row2].map((src, idx) => (
+                <button
+                  key={src + "-r2-" + idx}
+                  onClick={() => setLightbox(src)}
+                  className="relative h-48 w-72 sm:h-56 sm:w-80 overflow-hidden rounded-3xl cursor-pointer shrink-0 shadow-md transition duration-500 hover:scale-102 hover:shadow-lg hover:border hover:border-gold/30"
+                >
+                  <img
+                    src={src}
+                    alt="Traveller snapshot"
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-[800ms] hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 mt-12 text-center">
@@ -986,8 +1026,10 @@ function Gallery() {
 
 /* ---------------- Testimonials Preview ---------------- */
 function Testimonials() {
+  const { testimonials: testimonialsData } = useAppData();
+  const reviews = testimonialsData.reviews;
   // Repeat testimonials list to ensure a seamless infinite scroll loop
-  const loopTestimonials = [...testimonials, ...testimonials, ...testimonials];
+  const loopTestimonials = [...reviews, ...reviews, ...reviews];
 
   return (
     <section
@@ -1009,41 +1051,43 @@ function Testimonials() {
       </div>
 
       {/* Infinite scrolling testimonial cards from left to right */}
-      <div className="group mt-16 overflow-hidden py-4 [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
-        <div className="flex w-max animate-marquee-reverse gap-6 pr-6 group-hover:[animation-play-state:paused]">
-          {loopTestimonials.map((t, idx) => (
-            <div
-              key={t.name + "-" + idx}
-              className="w-[350px] sm:w-[420px] shrink-0 bg-white rounded-[32px] p-6 sm:p-8 border border-border shadow-sm flex flex-col gap-5 transition-transform duration-300 hover:scale-102 hover:shadow-luxury cursor-pointer"
-            >
-              {/* Star Rating */}
-              <div className="flex gap-1 text-gold">
-                {Array.from({ length: 5 }).map((_, k) => (
-                  <Star key={k} className="h-4 w-4 fill-gold text-gold" />
-                ))}
-              </div>
-              
-              {/* Quote */}
-              <p className="font-display text-sm sm:text-base leading-relaxed text-ink italic flex-1 line-clamp-4">
-                "{t.quote}"
-              </p>
+      {loopTestimonials.length > 0 && (
+        <div className="group mt-16 overflow-hidden py-4 [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
+          <div className="flex w-max animate-marquee-reverse gap-6 pr-6 group-hover:[animation-play-state:paused]">
+            {loopTestimonials.map((t: any, idx: number) => (
+              <div
+                key={t.name + "-" + idx}
+                className="w-[350px] sm:w-[420px] shrink-0 bg-white rounded-[32px] p-6 sm:p-8 border border-border shadow-sm flex flex-col gap-5 transition-transform duration-300 hover:scale-102 hover:shadow-luxury cursor-pointer"
+              >
+                {/* Star Rating */}
+                <div className="flex gap-1 text-gold">
+                  {Array.from({ length: t.rating || 5 }).map((_, k) => (
+                    <Star key={k} className="h-4 w-4 fill-gold text-gold" />
+                  ))}
+                </div>
+                
+                {/* Quote */}
+                <p className="font-display text-sm sm:text-base leading-relaxed text-ink italic flex-1 line-clamp-4">
+                  "{t.quote}"
+                </p>
 
-              {/* User profile */}
-              <div className="flex items-center gap-3.5 border-t border-secondary pt-4">
-                <img
-                  src={t.avatar}
-                  alt={t.name}
-                  className="h-11 w-11 rounded-full border border-white object-cover shadow"
-                />
-                <div className="text-left">
-                  <p className="text-xs sm:text-sm font-semibold text-ink leading-tight">{t.name}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{t.trip}</p>
+                {/* User profile */}
+                <div className="flex items-center gap-3.5 border-t border-secondary pt-4">
+                  <img
+                    src={t.avatar}
+                    alt={t.name}
+                    className="h-11 w-11 rounded-full border border-white object-cover shadow"
+                  />
+                  <div className="text-left">
+                    <p className="text-xs sm:text-sm font-semibold text-ink leading-tight">{t.name}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{t.trip}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* View All Testimonials Button below the loop */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 mt-12 text-center">
@@ -1057,44 +1101,30 @@ function Testimonials() {
   );
 }
 
-/* ---------------- How It Works ---------------- */
 function HowItWorks() {
-  const steps = [
-    {
-      n: "01",
-      t: "Choose Destination",
-      d: "Pick from 22+ curated destinations or tell us your dream.",
-    },
-    {
-      n: "02",
-      t: "Customise Your Trip",
-      d: "A specialist crafts an itinerary tailored to your pace & budget.",
-    },
-    {
-      n: "03",
-      t: "Book The Package",
-      d: "Lock it in with a small deposit — flights, stays, visas handled.",
-    },
-    {
-      n: "04",
-      t: "Enjoy Your Vacation",
-      d: "24/7 concierge on WhatsApp from take-off to homecoming.",
-    },
+  const { home } = useAppData();
+  const steps = home.howItWorks?.steps || [
+    { n: "01", t: "Choose Destination", d: "Pick from 22+ curated destinations or tell us your dream." },
+    { n: "02", t: "Customise Your Trip", d: "A specialist crafts an itinerary tailored to your pace & budget." },
+    { n: "03", t: "Book The Package", d: "Lock it in with a small deposit — flights, stays, visas handled." },
+    { n: "04", t: "Enjoy Your Vacation", d: "24/7 concierge on WhatsApp from take-off to homecoming." },
   ];
   return (
     <section className="bg-white py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <Reveal>
           <div className="text-center">
-            <p className="text-xs uppercase tracking-[0.4em] text-brand">How it works</p>
+            <p className="text-xs uppercase tracking-[0.4em] text-brand">
+              {home.howItWorks?.tagline || "How it works"}
+            </p>
             <h2 className="mt-3 font-display text-4xl font-semibold text-ink sm:text-5xl">
-              Four steps to <span className="italic text-gradient-brand">take-off.</span>
+              {home.howItWorks?.title || "Four steps to take-off."}
             </h2>
           </div>
         </Reveal>
         <div className="relative mt-16 grid gap-6 md:grid-cols-4">
           <div className="pointer-events-none absolute left-8 right-8 top-10 hidden h-px bg-gradient-to-r from-brand/0 via-brand/30 to-brand/0 md:block" />
-          {steps.map((s, i) => (
+          {steps.map((s: any, i: number) => (
             <Reveal key={s.n} delay={i * 0.1}>
               <div className="group relative flex h-full flex-col rounded-3xl border border-border bg-white p-6 transition hover:-translate-y-1 hover:shadow-luxury">
                 <div className="relative mb-4 flex items-center gap-3">
@@ -1117,6 +1147,7 @@ function HowItWorks() {
 /* ---------------- FAQ Preview ---------------- */
 function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
+  const { faqs, home } = useAppData();
   const previewFaqs = faqs.slice(0, 4);
 
   return (
@@ -1124,14 +1155,14 @@ function FAQ() {
       <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1fr_1.4fr]">
         <Reveal>
           <div>
-            <p className="text-xs uppercase tracking-[0.4em] text-brand">FAQ</p>
+            <p className="text-xs uppercase tracking-[0.4em] text-brand">
+              {home.faqSection?.tagline || "FAQ"}
+            </p>
             <h2 className="mt-3 font-display text-4xl font-semibold text-ink sm:text-5xl">
-              Questions,
-              <br />
-              <span className="italic text-gradient-brand">answered.</span>
+              {home.faqSection?.title || "Questions, answered."}
             </h2>
             <p className="mt-4 max-w-sm text-muted-foreground">
-              Can't find what you're looking for? Our concierge team is a WhatsApp message away.
+              {home.faqSection?.description || "Can't find what you're looking for? Our concierge team is a WhatsApp message away."}
             </p>
             <div className="mt-6 flex flex-wrap gap-2.5">
               <Link to="/contact">
@@ -1146,7 +1177,7 @@ function FAQ() {
           </div>
         </Reveal>
         <div className="flex flex-col gap-3">
-          {previewFaqs.map((f, i) => {
+          {previewFaqs.map((f: any, i: number) => {
             const isOpen = open === i;
             return (
               <Reveal key={f.q} delay={i * 0.05}>
@@ -1197,20 +1228,48 @@ function FAQ() {
 /* ---------------- Contact ---------------- */
 function Contact() {
   const [sent, setSent] = useState(false);
+  const { contact, addMessage, destinations, home } = useAppData();
+
+  const handleContactSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const phone = formData.get("phone") as string;
+    const email = formData.get("email") as string;
+    const selectEl = e.currentTarget.querySelector("select");
+    const destination = selectEl ? selectEl.value : "";
+    const textareaEl = e.currentTarget.querySelector("textarea");
+    const message = textareaEl ? textareaEl.value : "";
+
+    addMessage({
+      name,
+      phone,
+      email,
+      destination,
+      service: "Standard Holiday Tour",
+      travelDate: "Not Specified",
+      guests: "Not Specified",
+      message: message || "Contact form inquiry submitted from homepage."
+    });
+    setSent(true);
+    setTimeout(() => setSent(false), 4000);
+    e.currentTarget.reset();
+  };
+
   return (
     <section id="contact" className="relative overflow-hidden bg-white py-24">
       <div className="pointer-events-none absolute -left-40 top-20 h-96 w-96 rounded-full bg-brand/10 blur-3xl" />
       <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-2">
         <Reveal>
           <div>
-            <p className="text-xs uppercase tracking-[0.4em] text-brand">Get in touch</p>
+            <p className="text-xs uppercase tracking-[0.4em] text-brand">
+              {home.contactSection?.tagline || "Get in touch"}
+            </p>
             <h2 className="mt-3 font-display text-4xl font-semibold text-ink sm:text-5xl">
-              Let's design your
-              <br />
-              <span className="italic text-gradient-brand">next great trip.</span>
+              {home.contactSection?.title || "Let's design your next great trip."}
             </h2>
             <p className="mt-4 max-w-md text-muted-foreground">
-              Share a few details and a destination specialist will call you back within 24 hours with a personalised itinerary.
+              {home.contactSection?.description || "Share a few details and a destination specialist will call you back within 24 hours with a personalised itinerary."}
             </p>
 
             <div className="mt-8 grid gap-3">
@@ -1218,27 +1277,33 @@ function Contact() {
                 {
                   icon: MapPin,
                   label: "Office",
-                  value: "SkyNow Holidays, MG Road, Bengaluru — 560001",
+                  value: contact.address,
                 },
                 {
                   icon: Phone,
                   label: "Phone",
-                  value: "+91 12345 67890",
-                  href: "tel:+911234567890",
+                  value: contact.phone,
+                  href: `tel:${contact.phone}`,
                 },
                 {
                   icon: MessageCircle,
                   label: "WhatsApp",
                   value: "Chat 24/7",
-                  href: "https://wa.me/911234567890",
+                  href: contact.whatsapp,
                 },
                 {
                   icon: Mail,
                   label: "Email",
-                  value: "hello@skynowholidays.com",
-                  href: "mailto:hello@skynowholidays.com",
+                  value: contact.email,
+                  href: `mailto:${contact.email}`,
                 },
-                { icon: Calendar, label: "Hours", value: "Mon – Sun · 9 AM – 9 PM IST" },
+                {
+                  icon: Globe,
+                  label: "Website",
+                  value: contact.website,
+                  href: contact.website.startsWith("http") ? contact.website : `https://${contact.website}`,
+                },
+                { icon: Calendar, label: "Hours", value: contact.hours },
               ].map((r) => (
                 <a
                   key={r.label}
@@ -1263,7 +1328,7 @@ function Contact() {
             <div className="mt-6 overflow-hidden rounded-3xl border border-border shadow-md">
               <iframe
                 title="Office map"
-                src="https://www.google.com/maps?q=Bengaluru%20MG%20Road&output=embed"
+                src={contact.mapIframe}
                 className="h-64 w-full border-0"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -1274,11 +1339,7 @@ function Contact() {
 
         <Reveal delay={0.1}>
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSent(true);
-              setTimeout(() => setSent(false), 4000);
-            }}
+            onSubmit={handleContactSubmit}
             className="glass rounded-[36px] p-6 shadow-luxury sm:p-10"
           >
             <div className="grid gap-4 sm:grid-cols-2">
@@ -1298,8 +1359,8 @@ function Contact() {
                 </label>
                 <select className="mt-1 w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm text-ink outline-none focus:border-brand">
                   <option value="">Select a destination</option>
-                  {destinations.map((d) => (
-                    <option key={d.name}>{d.name}</option>
+                  {destinations.map((d: any) => (
+                    <option key={d.name} value={d.name}>{d.name}</option>
                   ))}
                 </select>
               </div>

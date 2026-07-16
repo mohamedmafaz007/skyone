@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Star, Calendar, Search, MessageCircle, Phone, ChevronDown } from "lucide-react";
 import CommonHero from "@/components/skynow/CommonHero";
-import { destinations } from "@/components/skynow/data";
+import { useAppData } from "@/lib/dataStore";
 import { getSlug } from "@/components/skynow/packageDetailsData";
 
 export const Route = createFileRoute("/packages/")({
@@ -27,6 +27,7 @@ function getRegion(name: string): (typeof REGIONS)[number] {
 }
 
 function AllPackagesPage() {
+  const { destinations, addMessage } = useAppData();
   const [selectedRegion, setSelectedRegion] = useState<(typeof REGIONS)[number]>("All");
   const [search, setSearch] = useState("");
   const [sent, setSent] = useState(false);
@@ -58,7 +59,7 @@ function AllPackagesPage() {
 
       return true;
     });
-  }, [search, selectedRegion]);
+  }, [search, selectedRegion, destinations]);
 
   return (
     <div className="bg-background pb-20">
@@ -106,7 +107,6 @@ function AllPackagesPage() {
           {/* Left Column: Packages grid */}
           <main className="min-w-0 space-y-6">
             <motion.div
-              layout
               className="grid grid-cols-1 gap-6 sm:grid-cols-2"
             >
               <AnimatePresence mode="popLayout">
@@ -116,7 +116,7 @@ function AllPackagesPage() {
                     return (
                       <motion.article
                         key={p.name}
-                        layout
+                        layout="position"
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
@@ -212,8 +212,26 @@ function AllPackagesPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
+                  addMessage({
+                    name: form.name,
+                    phone: form.phone,
+                    email: form.email,
+                    destination: form.destination,
+                    service: "Standard Holiday Tour",
+                    travelDate: "Not Specified",
+                    guests: form.guests,
+                    message: form.message || "Plan Your Journey enquiry submitted from packages index page."
+                  });
                   setSent(true);
                   setTimeout(() => setSent(false), 4000);
+                  setForm({
+                    name: "",
+                    phone: "",
+                    email: "",
+                    destination: "",
+                    guests: "2 Guests",
+                    message: ""
+                  });
                 }}
                 className="space-y-4"
               >
@@ -298,7 +316,7 @@ function AllPackagesPage() {
                   </button>
 
                   <a
-                    href={`https://wa.me/911234567890?text=Hi%20SkyNow%20Holidays%2C%20I'd%20like%20to%20enquire%20about%20booking%20a%20trip%20to%20${encodeURIComponent(form.destination || "our destinations")}.`}
+                    href={`https://wa.me/917639277770?text=Hi%20SkyNow%20Holidays%2C%20I'd%20like%20to%20enquire%20about%20booking%20a%20trip%20to%20${encodeURIComponent(form.destination || "our destinations")}.`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center justify-center gap-2 rounded-full bg-[#00c73c] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#00b034] cursor-pointer"
@@ -307,7 +325,7 @@ function AllPackagesPage() {
                   </a>
 
                   <a
-                    href="tel:+911234567890"
+                    href="tel:+917639277770"
                     className="flex items-center justify-center gap-2 rounded-full bg-secondary py-3 text-xs font-bold text-ink transition hover:bg-secondary/80 cursor-pointer"
                   >
                     <Phone className="h-3.5 w-3.5" /> Call Now

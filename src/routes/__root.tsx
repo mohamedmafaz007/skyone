@@ -180,6 +180,8 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const [loaded, setLoaded] = useState(false);
+  const routerState = useRouterState();
+  const isAdmin = routerState.location.pathname === "/admin";
 
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 1000);
@@ -190,13 +192,13 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <LoadingScreen done={loaded} />
       <div className="flex min-h-screen flex-col bg-background font-sans text-ink">
-        <Navbar />
+        {!isAdmin && <Navbar />}
         {/* All content renders full-bleed behind the header overlay */}
         <div className="flex-1">
           <Outlet />
         </div>
-        <Footer />
-        <FloatingActions />
+        {!isAdmin && <Footer />}
+        {!isAdmin && <FloatingActions />}
       </div>
     </QueryClientProvider>
   );

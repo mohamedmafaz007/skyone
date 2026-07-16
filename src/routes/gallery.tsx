@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Eye, X } from "lucide-react";
 import CommonHero from "@/components/skynow/CommonHero";
-import { galleryImages } from "@/components/skynow/data";
+import { useAppData } from "@/lib/dataStore";
 
 export const Route = createFileRoute("/gallery")({
   component: GalleryPage,
@@ -11,50 +11,30 @@ export const Route = createFileRoute("/gallery")({
 
 const CATEGORIES = ["All", "Asia", "Europe", "Beach", "Adventure", "Luxury"] as const;
 
-// Categorized image index maps (to simulate a real sorted image gallery)
-const CATEGORY_MAP: Record<string, string[]> = {
-  All: galleryImages,
-  Asia: [
-    galleryImages[0], // Bali
-    galleryImages[7], // Vietnam
-    galleryImages[11], // Nepal/Bhutan
-    galleryImages[1], // Singapore
-    galleryImages[10], // Dubai
-  ],
-  Europe: [
-    galleryImages[2], // Swiss
-    galleryImages[3], // Paris
-    galleryImages[8], // Turkey
-  ],
-  Beach: [
-    galleryImages[0], // Bali
-    galleryImages[4], // Beach
-    galleryImages[9], // Maldives style
-  ],
-  Adventure: [
-    galleryImages[5], // Camp
-    galleryImages[6], // Mountains
-    galleryImages[11], // Nepal
-  ],
-  Luxury: [
-    galleryImages[9], // Pool villa
-    galleryImages[10], // Yacht
-    galleryImages[2], // Luxury stay
-  ],
-};
-
 function GalleryPage() {
+  const { galleryImages: galleryItems, gallerySection } = useAppData();
   const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [displayedImages, setDisplayedImages] = useState<string[]>([]);
+  const [displayedImages, setDisplayedImages] = useState<string[]>(() => {
+    return galleryItems.map((item: any) => item.url).slice(0, 6);
+  });
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(() => galleryItems.length > 6);
+
+  const filteredUrls = useMemo(() => {
+    if (cat === "All") {
+      return galleryItems.map(item => item.url);
+    }
+    return galleryItems
+      .filter(item => item.category.toLowerCase() === cat.toLowerCase())
+      .map(item => item.url);
+  }, [cat, galleryItems]);
 
   // Initialize gallery
   useEffect(() => {
-    setDisplayedImages(CATEGORY_MAP[cat].slice(0, 6));
-    setHasMore(CATEGORY_MAP[cat].length > 6);
-  }, [cat]);
+    setDisplayedImages(filteredUrls.slice(0, 6));
+    setHasMore(filteredUrls.length > 6);
+  }, [cat, filteredUrls]);
 
   // Infinite scroll simulator
   const handleLoadMore = () => {
@@ -63,12 +43,11 @@ function GalleryPage() {
 
     setTimeout(() => {
       const currentLength = displayedImages.length;
-      const fullList = CATEGORY_MAP[cat];
-      const nextBatch = fullList.slice(currentLength, currentLength + 4);
+      const nextBatch = filteredUrls.slice(currentLength, currentLength + 4);
 
       setDisplayedImages((prev) => [...prev, ...nextBatch]);
       setLoading(false);
-      if (currentLength + nextBatch.length >= fullList.length) {
+      if (currentLength + nextBatch.length >= filteredUrls.length) {
         setHasMore(false);
       }
     }, 1000);
@@ -89,12 +68,24 @@ function GalleryPage() {
   return (
     <div className="bg-background pb-20">
       <CommonHero
-        title="Gallery"
-        subtitle="Unfiltered frames from our travellers' journeys across five continents."
-        bgImage="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1600&q=80"
+        title={gallerySection?.title || "Gallery"}
+        subtitle={gallerySection?.subtitle || "Unfiltered frames from our travellers' journeys across five continents."}
+        bgImage={gallerySection?.bgImage || "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1600&q=80"}
       />
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+        {/* Travel Diaries Heading */}
+        {(gallerySection?.travelDiariesTitle || gallerySection?.travelDiariesSubtitle) && (
+          <div className="text-center mb-10">
+            {gallerySection?.travelDiariesTitle && (
+              <h2 className="font-display text-3xl font-bold text-ink mb-2">{gallerySection.travelDiariesTitle}</h2>
+            )}
+            {gallerySection?.travelDiariesSubtitle && (
+              <p className="text-base text-ink/60">{gallerySection.travelDiariesSubtitle}</p>
+            )}
+          </div>
+        )}
+
         {/* Category Filters */}
         <div className="flex flex-wrap justify-center gap-2 mb-12">
           {CATEGORIES.map((c) => (
@@ -119,14 +110,13 @@ function GalleryPage() {
 
         {/* Masonry Grid */}
         <motion.div
-          layout
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           <AnimatePresence mode="popLayout">
             {displayedImages.map((src, idx) => (
               <motion.article
                 key={src + idx}
-                layout
+                layout="position"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}

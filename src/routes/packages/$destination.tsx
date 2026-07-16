@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import CommonHero from "@/components/skynow/CommonHero";
 import { getPackageDetails, getSlug } from "@/components/skynow/packageDetailsData";
-import { destinations } from "@/components/skynow/data";
+import { useAppData } from "@/lib/dataStore";
 
 export const Route = createFileRoute("/packages/$destination")({
   component: PackageDetailsPage,
@@ -35,10 +35,12 @@ const TABS = [
 
 function PackageDetailsPage() {
   const { destination } = Route.useParams();
+  const { destinations, addMessage } = useAppData();
   const details = getPackageDetails(destination);
   
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["id"]>("overview");
   const [openDay, setOpenDay] = useState<string | null>("Day 1");
+  const [activePhoto, setActivePhoto] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -59,6 +61,30 @@ function PackageDetailsPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [destination]);
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    addMessage({
+      name: form.name,
+      phone: form.phone,
+      email: form.email,
+      destination: form.destination,
+      service: "Standard Holiday Tour",
+      travelDate: "Not Specified",
+      guests: form.guests,
+      message: form.message || `Plan Your Journey inquiry submitted from package details page for ${form.destination}.`
+    });
+    setSent(true);
+    setTimeout(() => setSent(false), 4000);
+    setForm({
+      name: "",
+      phone: "",
+      email: "",
+      destination: details?.name || "",
+      guests: "2 Guests",
+      message: ""
+    });
+  };
 
   if (!details) {
     return (
@@ -161,11 +187,7 @@ function PackageDetailsPage() {
           </div>
 
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSent(true);
-              setTimeout(() => setSent(false), 4000);
-            }}
+            onSubmit={handleFormSubmit}
             className="space-y-4"
           >
             <input
@@ -249,7 +271,7 @@ function PackageDetailsPage() {
               </button>
 
               <a
-                href={`https://wa.me/911234567890?text=Hi%20SkyNow%20Holidays%2C%20I'd%20like%20to%20enquire%20about%20booking%20a%20trip%20to%20${encodeURIComponent(form.destination || "our destinations")}.`}
+                href={`https://wa.me/917639277770?text=Hi%20SkyNow%20Holidays%2C%20I'd%20like%20to%20enquire%20about%20booking%20a%20trip%20to%20${encodeURIComponent(form.destination || "our destinations")}.`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center justify-center gap-2 rounded-full bg-[#00c73c] py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#00b034] cursor-pointer"
@@ -258,7 +280,7 @@ function PackageDetailsPage() {
               </a>
 
               <a
-                href="tel:+911234567890"
+                href="tel:+917639277770"
                 className="flex items-center justify-center gap-2 rounded-full bg-secondary py-3.5 text-sm font-bold text-ink transition hover:bg-secondary/80 cursor-pointer"
               >
                 <Phone className="h-4 w-4" /> Call Now
@@ -459,6 +481,7 @@ function PackageDetailsPage() {
                   {[...details.images, ...details.images, ...details.images].map((img, i) => (
                     <div
                       key={img + "-" + i}
+                      onClick={() => setActivePhoto(img)}
                       className="h-44 w-64 sm:h-52 sm:w-80 overflow-hidden rounded-2xl border border-border shadow-md shrink-0 transition duration-500 hover:scale-102 cursor-pointer"
                     >
                       <img
@@ -500,11 +523,7 @@ function PackageDetailsPage() {
               </div>
 
               <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setSent(true);
-                  setTimeout(() => setSent(false), 4000);
-                }}
+                onSubmit={handleFormSubmit}
                 className="space-y-4"
               >
                 <input
@@ -588,7 +607,7 @@ function PackageDetailsPage() {
                   </button>
 
                   <a
-                    href={`https://wa.me/911234567890?text=Hi%20SkyNow%20Holidays%2C%20I'd%20like%20to%20enquire%20about%20booking%20a%20trip%20to%20${encodeURIComponent(form.destination || "our destinations")}.`}
+                    href={`https://wa.me/917639277770?text=Hi%20SkyNow%20Holidays%2C%20I'd%20like%20to%20enquire%20about%20booking%20a%20trip%20to%20${encodeURIComponent(form.destination || "our destinations")}.`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center justify-center gap-2 rounded-full bg-[#00c73c] py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#00b034] cursor-pointer"
@@ -597,7 +616,7 @@ function PackageDetailsPage() {
                   </a>
 
                   <a
-                    href="tel:+911234567890"
+                    href="tel:+917639277770"
                     className="flex items-center justify-center gap-2 rounded-full bg-secondary py-3.5 text-sm font-bold text-ink transition hover:bg-secondary/80 cursor-pointer"
                   >
                     <Phone className="h-4 w-4" /> Call Now
@@ -644,6 +663,31 @@ function PackageDetailsPage() {
           </div>
         </div>
       </section>
+
+      {/* Lightbox Modal */}
+      {activePhoto && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm transition-all duration-300 animate-fade-in"
+          onClick={() => setActivePhoto(null)}
+        >
+          <button
+            onClick={() => setActivePhoto(null)}
+            className="absolute right-6 top-6 rounded-full bg-white/10 p-2.5 text-white hover:bg-white/20 transition cursor-pointer"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <div
+            className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-2xl shadow-luxury animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={activePhoto}
+              alt="Full size view"
+              className="max-h-[85vh] max-w-[85vw] rounded-xl object-contain"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

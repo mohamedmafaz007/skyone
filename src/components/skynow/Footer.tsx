@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Youtube, Globe } from "lucide-react";
 import logoImage from "@/assets/FINAL-removebg-preview.png";
+import { useAppData } from "@/lib/dataStore";
 
 const QUICK_LINKS = [
   { label: "Home", to: "/" },
@@ -26,6 +27,7 @@ const POPULAR_DESTINATIONS = [
 ] as const;
 
 export default function Footer() {
+  const { contact } = useAppData();
   return (
     <footer className="relative overflow-hidden bg-[oklch(0.13_0.03_265)] pt-20 text-white">
       {/* Background radial glow */}
@@ -124,19 +126,25 @@ export default function Footer() {
             <div className="mt-6 space-y-2 text-sm text-white/70">
               <p className="flex items-center gap-2.5">
                 <Phone className="h-4 w-4 text-gold shrink-0" />
-                <a href="tel:+911234567890" className="hover:text-gold">
-                  +91 12345 67890
+                <a href={`tel:${contact.phone}`} className="hover:text-gold">
+                  {contact.phone}
                 </a>
               </p>
               <p className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 text-gold shrink-0" />
-                <a href="mailto:hello@skynowholidays.com" className="hover:text-gold">
-                  hello@skynowholidays.com
+                <a href={`mailto:${contact.email}`} className="hover:text-gold">
+                  {contact.email}
+                </a>
+              </p>
+              <p className="flex items-center gap-2.5">
+                <Globe className="h-4 w-4 text-gold shrink-0" />
+                <a href={contact.website.startsWith("http") ? contact.website : `https://${contact.website}`} target="_blank" rel="noreferrer" className="hover:text-gold">
+                  {contact.website}
                 </a>
               </p>
               <p className="flex items-center gap-2.5">
                 <MapPin className="h-4 w-4 text-gold shrink-0" />
-                <span>MG Road, Bengaluru — 560001</span>
+                <span>{contact.address}</span>
               </p>
             </div>
           </div>

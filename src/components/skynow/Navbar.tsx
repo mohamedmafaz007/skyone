@@ -34,8 +34,10 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-500 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm ${
-        scrolled ? "py-3" : "py-4"
+      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-[#0B1528]/85 backdrop-blur-md border-b border-white/10 shadow-lg py-3"
+          : "bg-transparent py-5"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -57,14 +59,14 @@ export default function Navbar() {
                 key={item.to}
                 to={item.to}
                 className={`relative px-4 py-2 text-sm font-semibold tracking-wide transition-colors ${
-                  active ? "text-brand" : "text-slate-600 hover:text-brand"
+                  active ? "text-gold" : "text-white/80 hover:text-gold"
                 }`}
               >
                 {item.label}
                 {active && (
                   <motion.span
                     layoutId="nav-underline"
-                    className="absolute bottom-0 left-4 right-4 h-0.5 bg-brand"
+                    className="absolute bottom-0 left-4 right-4 h-0.5 bg-gold"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -77,7 +79,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-6 xl:flex">
           <Link
             to="/contact"
-            className="rounded-full bg-brand px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-luxury transition hover:brightness-110 hover:shadow-2xl"
+            className="rounded-full bg-gold px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-gold-foreground shadow-luxury transition hover:brightness-110 hover:shadow-2xl"
           >
             Get Quote
           </Link>
@@ -86,7 +88,7 @@ export default function Navbar() {
         {/* Mobile Toggle */}
         <button
           onClick={() => setOpen(!open)}
-          className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 xl:hidden cursor-pointer"
+          className="grid h-10 w-10 place-items-center rounded-full border border-white/20 text-white hover:bg-white/10 xl:hidden cursor-pointer transition-colors"
           aria-label={open ? "Close menu" : "Open menu"}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -156,7 +158,7 @@ export default function Navbar() {
               {/* Drawer Footer info */}
               <div className="mt-auto border-t border-white/10 pt-6 space-y-4">
                 <a
-                  href="https://wa.me/911234567890"
+                  href="https://wa.me/917639277770"
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-2 text-sm font-semibold text-white/90 hover:text-emerald-400"

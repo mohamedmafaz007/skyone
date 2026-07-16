@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Search, HelpCircle, MessageCircle } from "lucide-react";
 import CommonHero from "@/components/skynow/CommonHero";
+import { useAppData } from "@/lib/dataStore";
 
 export const Route = createFileRoute("/faq")({
   component: FaqPage,
@@ -10,64 +11,22 @@ export const Route = createFileRoute("/faq")({
 
 const FAQ_CATEGORIES = ["All", "Booking", "Visa & Insurance", "Customization", "Support", "Payments"] as const;
 
-const FAQ_ITEMS = [
-  {
-    q: "How do I book a holiday package with SkyNow?",
-    a: "Share your travel dates and preferred destination via our contact form or WhatsApp. A destination specialist will design a personalized itinerary for you within 24 hours. Once you are satisfied with the details, you can secure the booking with a small deposit.",
-    category: "Booking",
-  },
-  {
-    q: "Do you handle visa processing and travel insurance?",
-    a: "Yes. Every international package includes end-to-end visa assistance. Our documentation team audits your paperwork, books slots, and preps you for interviews. We also offer comprehensive medical & trip travel insurance through leading global underwriters.",
-    category: "Visa & Insurance",
-  },
-  {
-    q: "Can I customize an existing package itinerary?",
-    a: "Absolutely! We do not offer fixed group packages unless requested. Every package shown on our website is a starting reference. You can add nights, change hotels, include private activities, or even combine multiple countries.",
-    category: "Customization",
-  },
-  {
-    q: "Are international flight tickets included in your quotes?",
-    a: "Most of our packages are quoted land-only (transfers, hotels, tours, visas) because airfares fluctuate rapidly and travellers prefer using mileage points. However, on request, our ticketing desk will quote and secure the best available direct flight fares for you.",
-    category: "Booking",
-  },
-  {
-    q: "What support is provided during the actual trip?",
-    a: "You will have access to our 24/7 dedicated WhatsApp support desk. This is run by real destination managers who can assist with real-time needs (e.g. hotel room upgrades, re-scheduling transfers, recommending local restaurants, or sorting emergency changes).",
-    category: "Support",
-  },
-  {
-    q: "What is your package cancellation policy?",
-    a: "Our cancellation policy depends on the hotel and airline policies booked. Generally, land packages cancelled 30 days prior to departure qualify for a full refund minus a minimal processing fee. Detailed cancellation rules are provided at the time of quotation.",
-    category: "Payments",
-  },
-  {
-    q: "What payment methods do you accept?",
-    a: "We accept secure credit cards, debit cards, UPI, and bank transfers (NEFT/RTGS/IMPS). We also offer interest-free EMI options with partner banks.",
-    category: "Payments",
-  },
-  {
-    q: "Do we travel in a large coach or private vehicles?",
-    a: "All of our standard packages are strictly private tours. You will have a dedicated private air-conditioned vehicle (SUV or sedan) and a private driver for all airport transfers and city sightseeing tours.",
-    category: "Customization",
-  },
-];
-
 function FaqPage() {
+  const { faqs } = useAppData();
   const [cat, setCat] = useState<(typeof FAQ_CATEGORIES)[number]>("All");
   const [search, setSearch] = useState("");
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   // Dynamic filter
   const filteredFaqs = useMemo(() => {
-    return FAQ_ITEMS.filter((item) => {
+    return faqs.filter((item: any) => {
       const matchesCategory = cat === "All" || item.category === cat;
       const matchesSearch =
         item.q.toLowerCase().includes(search.toLowerCase()) ||
         item.a.toLowerCase().includes(search.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [cat, search]);
+  }, [cat, search, faqs]);
 
   return (
     <div className="bg-background pb-20">
@@ -124,7 +83,7 @@ function FaqPage() {
                 const isOpen = openIdx === idx;
                 return (
                   <motion.article
-                    layout
+                    layout="position"
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.98 }}
@@ -191,7 +150,7 @@ function FaqPage() {
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <a
-              href="https://wa.me/911234567890"
+              href="https://wa.me/917639277770"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-white shadow hover:scale-105 transition"
