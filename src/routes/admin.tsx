@@ -1386,28 +1386,40 @@ function PackagesTab({ appData }: { appData: any }) {
     try {
       let resultData: any = null;
       const isPdf = aiFile && (aiFile.type === "application/pdf" || aiFile.name.toLowerCase().endsWith(".pdf"));
-
       const token = (typeof window !== "undefined" ? localStorage.getItem("skynow_admin_token") : "") || "";
+      const textToAnalyze = aiPastedText.trim();
 
-      if (isPdf) {
-        // Send PDF as base64 directly to Gemini server-side function
-        const base64 = await fileToBase64(aiFile);
-        resultData = await callGeminiServer({ data: { base64Pdf: base64, token } });
-      } else {
-        // Analyze pasted / extracted text on the server
-        const textToAnalyze = aiPastedText.trim();
-        if (!textToAnalyze) {
-          throw new Error("No text to analyze. Paste text or upload a file first.");
+      try {
+        if (isPdf) {
+          // Send PDF as base64 directly to Gemini server-side function
+          const base64 = await fileToBase64(aiFile);
+          resultData = await callGeminiServer({ data: { base64Pdf: base64, token } });
+        } else {
+          // Analyze pasted / extracted text on the server
+          if (!textToAnalyze) {
+            throw new Error("No text to analyze. Paste text or upload a file first.");
+          }
+          resultData = await callGeminiServer({ data: { text: textToAnalyze, token } });
         }
-        resultData = await callGeminiServer({ data: { text: textToAnalyze, token } });
+        
+        // Apply the result data to local state
+        applyGeminiResult(resultData);
+        toast.success("✅ Package details auto-filled! Review the fields below and click Save Changes.");
+      } catch (serverErr: any) {
+        console.warn("Backend Gemini parsing failed, using high-accuracy local fallback parser:", serverErr);
+        if (textToAnalyze) {
+          const localParsed = parsePackageText(textToAnalyze);
+          // Merge local parsed dest and details fields to match expected flat res schema
+          const mergedResult = { ...localParsed.dest, ...localParsed.details };
+          applyGeminiResult(mergedResult);
+          toast.success("⚠️ Backend API unavailable. Local parser used to auto-fill details.");
+        } else {
+          throw serverErr;
+        }
       }
-
-      // Apply the result data to local state
-      applyGeminiResult(resultData);
-      toast.success("✅ Package details auto-filled! Review the fields below and click Save Changes.");
     } catch (err: any) {
       console.error("Gemini analysis error:", err);
-      toast.error(err.message || "Analysis failed. Make sure GEMINI_API_KEY is configured in your .env file.");
+      toast.error(err.message || "Analysis failed. Make sure text is pasted or a document is uploaded.");
     } finally {
       setAiParsing(false);
     }
