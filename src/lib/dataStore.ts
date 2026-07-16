@@ -306,6 +306,7 @@ export type StoreData = typeof STATIC_DEFAULTS;
 
 // Safe localStorage access
 const STORAGE_KEY = "skynow_holiday_app_data";
+const CACHE_VERSION = "v4"; // bump this to clear all cached data on next load
 
 export function getStoreData(): StoreData {
   if (typeof window === "undefined") {
@@ -314,10 +315,17 @@ export function getStoreData(): StoreData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(STATIC_DEFAULTS));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...STATIC_DEFAULTS, _v: CACHE_VERSION }));
       return STATIC_DEFAULTS;
     }
     const parsed = JSON.parse(raw);
+
+    // Version mismatch — clear corrupt cache and return defaults
+    if (parsed._v !== CACHE_VERSION) {
+      console.warn("[dataStore] Cache version mismatch — clearing stale data.");
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...STATIC_DEFAULTS, _v: CACHE_VERSION }));
+      return STATIC_DEFAULTS;
+    }
     
     // Self-healing check: automatically reset default to image if populated with the old demo video
     if (parsed.home && parsed.home.hero && parsed.home.hero.bgUrl === "https://vjs.zencdn.net/v/oceans.mp4") {
@@ -459,17 +467,31 @@ export function useAppData() {
           if (dbDests.length > 0) {
             dbDests.forEach((d) => {
               const slug = getSlug(d.name);
+              
+              // Extract itinerary from packages if present, else fallback to current or generated
+              let itinerary: any[] = [];
+              if (d.packages && d.packages.length > 0 && d.packages[0].itineraries) {
+                itinerary = d.packages[0].itineraries.map((it: any) => ({
+                  day: it.day || "",
+                  title: it.title || "",
+                  desc: it.desc || ""
+                }));
+              } else if (current.destinationDetailsDb[slug] && current.destinationDetailsDb[slug].itinerary) {
+                itinerary = current.destinationDetailsDb[slug].itinerary;
+              }
+
               detailsDb[slug] = {
-                overview: d.overview,
-                highlights: d.highlights,
-                inclusions: d.inclusions,
-                exclusions: d.exclusions,
-                hotels: d.hotels,
-                transportation: d.transportation,
-                visaInfo: d.visaInfo,
-                bestTime: d.bestTime,
-                faqs: d.faqs,
-                images: d.images
+                overview: d.overview || "",
+                highlights: Array.isArray(d.highlights) ? d.highlights : [],
+                inclusions: Array.isArray(d.inclusions) ? d.inclusions : [],
+                exclusions: Array.isArray(d.exclusions) ? d.exclusions : [],
+                hotels: Array.isArray(d.hotels) ? d.hotels : [],
+                transportation: d.transportation || "",
+                visaInfo: d.visaInfo || "",
+                bestTime: d.bestTime || "",
+                faqs: Array.isArray(d.faqs) ? d.faqs : [],
+                images: Array.isArray(d.images) ? d.images : [],
+                itinerary: itinerary
               };
             });
           }
@@ -493,15 +515,9 @@ export function useAppData() {
               duration: d.duration,
               price: d.price,
               rating: d.rating
-            })) : current.destinations,
+            })) : (current.destinations || []),
             destinationDetailsDb: detailsDb,
-            servicesList: current.services, // keep reference
-            aboutDetails: current.about,
-            galleryImagesList: current.galleryImages,
-            testimonialsList: current.testimonials,
-            faqList: current.faqs,
-            contactDetails: current.contact,
-            messages: dbMsgs.length > 0 ? dbMsgs : current.messages
+            messages: dbMsgs.length > 0 ? dbMsgs : (current.messages || [])
           };
 
           // Also save in localStorage as cache

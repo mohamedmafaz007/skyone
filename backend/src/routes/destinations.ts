@@ -12,6 +12,15 @@ router.get("/", async (req, res) => {
   try {
     const destinations = await prisma.destination.findMany({
       orderBy: { name: "asc" },
+      include: {
+        packages: {
+          include: {
+            itineraries: {
+              orderBy: { day: "asc" },
+            },
+          },
+        },
+      },
     });
     return res.json(destinations);
   } catch (error) {

@@ -1,23 +1,27 @@
-import { Pool } from "@neondatabase/serverless";
-import { PrismaNeon } from "@prisma/adapter-neon";
+// Reliable standard PrismaClient — works perfectly for Node.js Express dev server
+// The Neon serverless adapter is only needed for edge/Cloudflare Workers deployments
 import { PrismaClient } from "@prisma/client";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  console.error("CRITICAL ERROR: DATABASE_URL is not configured in environment variables.");
-}
-
-const pool = new Pool({ connectionString });
-const adapter = new PrismaNeon(pool as any);
-
 declare global {
-  var prisma: PrismaClient | undefined;
+  // eslint-disable-next-line no-var
+  var __prisma: PrismaClient | undefined;
 }
 
-export const prisma = global.prisma || new PrismaClient({ adapter });
+// Singleton pattern - reuse in dev (prevents exhausting connections on hot reload)
+const prisma: PrismaClient =
+  global.__prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
+  });
 
 if (process.env.NODE_ENV !== "production") {
-  global.prisma = prisma;
+  global.__prisma = prisma;
 }
 
+export { prisma };
 export default prisma;

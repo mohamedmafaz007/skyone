@@ -5,12 +5,12 @@
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
-    "dev": "node --loader ts-node/esm src/server.ts",
+    "dev": "node --env-file=.env --loader ts-node/esm src/server.ts",
     "build": "tsc",
-    "start": "node dist/src/server.js",
+    "start": "node --env-file=.env dist/src/server.js",
     "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push",
-    "prisma:seed": "node --loader ts-node/esm prisma/seed.ts"
+    "prisma:push": "dotenv -e .env -- prisma db push",
+    "prisma:seed": "node --env-file=.env --loader ts-node/esm prisma/seed.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

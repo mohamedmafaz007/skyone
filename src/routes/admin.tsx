@@ -409,7 +409,7 @@ function AdminPage() {
     {
       label: "Main",
       items: [
-        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, badge: appData.messages.filter((m: any) => !m.read).length || null },
+        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, badge: (appData.messages || []).filter((m: any) => !m.read).length || null },
       ]
     },
     {
@@ -1194,12 +1194,22 @@ export const callGeminiServer = createServerFn({ method: "POST" })
    PACKAGES TAB
    ========================================================================= */
 function PackagesTab({ appData }: { appData: any }) {
-  const [destinations, setDestinations] = useState(appData.destinations);
-  const [db, setDb] = useState(appData.destinationDetailsDb);
+  const [destinations, setDestinations] = useState<any[]>(appData.destinations || []);
+  const [db, setDb] = useState<Record<string, any>>(appData.destinationDetailsDb || {});
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const [searchQ, setSearchQ] = useState("");
   const [filterTag, setFilterTag] = useState("All");
   const [confirmDelete, setConfirmDelete] = useState<{ slug: string; name: string } | null>(null);
+
+  // Keep local state in sync when appData updates from backend fetch
+  useEffect(() => {
+    if (Array.isArray(appData.destinations) && appData.destinations.length > 0) {
+      setDestinations(appData.destinations);
+    }
+    if (appData.destinationDetailsDb && Object.keys(appData.destinationDetailsDb).length > 0) {
+      setDb(appData.destinationDetailsDb);
+    }
+  }, [appData.destinations, appData.destinationDetailsDb]);
 
   const [aiPastedText, setAiPastedText] = useState("");
   const [aiFileName, setAiFileName] = useState("");
@@ -1295,7 +1305,7 @@ function PackagesTab({ appData }: { appData: any }) {
     const nextSlug = destFields.name ? getSlug(destFields.name) : activeSlug;
     
     // 1. Update destinations list
-    const newDests = destinations.map((d: any) => {
+    const newDests = (Array.isArray(destinations) ? destinations : []).map((d: any) => {
       if (getSlug(d.name) === activeSlug) {
         return { ...d, ...destFields };
       }
@@ -1303,7 +1313,7 @@ function PackagesTab({ appData }: { appData: any }) {
     });
 
     // 2. Update DB details
-    const targetDest = destinations.find((d: any) => getSlug(d.name) === activeSlug);
+    const targetDest = (Array.isArray(destinations) ? destinations : []).find((d: any) => getSlug(d.name) === activeSlug);
     const baseDetails = db[activeSlug] || (targetDest ? generateFallbackDetails(targetDest) : emptyDetails);
     const updatedDetails = { ...baseDetails, ...detailsFields };
 
@@ -1431,7 +1441,7 @@ function PackagesTab({ appData }: { appData: any }) {
     const defaultName = `Draft Package #${Date.now().toString().slice(-4)}`;
     const defaultSlug = getSlug(defaultName);
     const newDest = { name: defaultName, country: "", tag: "International" as const, image: "", blurb: "", duration: "", price: "", rating: 5.0 };
-    const newDests = [newDest, ...destinations];
+    const newDests = [newDest, ...(Array.isArray(destinations) ? destinations : [])];
     const newDb = { ...db, [defaultSlug]: emptyDetails };
     setDestinations(newDests); setDb(newDb);
     setActiveSlug(defaultSlug);
@@ -1439,7 +1449,7 @@ function PackagesTab({ appData }: { appData: any }) {
   };
 
   const handleDeletePackage = (slug: string) => {
-    const newDests = destinations.filter((d: any) => getSlug(d.name) !== slug);
+    const newDests = (Array.isArray(destinations) ? destinations : []).filter((d: any) => getSlug(d.name) !== slug);
     const newDb = { ...db }; delete newDb[slug];
     setDestinations(newDests); setDb(newDb);
     if (activeSlug === slug) setActiveSlug(null);
@@ -1448,7 +1458,7 @@ function PackagesTab({ appData }: { appData: any }) {
   };
 
   const handleUpdateDestItem = (slug: string, fields: any) => {
-    const newDests = destinations.map((d: any) => {
+    const newDests = (Array.isArray(destinations) ? destinations : []).map((d: any) => {
       if (getSlug(d.name) === slug) {
         const updated = { ...d, ...fields };
         if (fields.name && fields.name !== d.name) {
@@ -1465,7 +1475,7 @@ function PackagesTab({ appData }: { appData: any }) {
   };
 
   const handleUpdateDetails = (slug: string, details: any) => {
-    const targetDest = destinations.find((d: any) => getSlug(d.name) === slug);
+    const targetDest = (Array.isArray(destinations) ? destinations : []).find((d: any) => getSlug(d.name) === slug);
     const baseDetails = db[slug] || (targetDest ? generateFallbackDetails(targetDest) : emptyDetails);
     const updatedDetails = { ...baseDetails, ...details };
     const newDb = { ...db, [slug]: updatedDetails };
@@ -1478,10 +1488,11 @@ function PackagesTab({ appData }: { appData: any }) {
     toast.success("All package changes saved!");
   };
 
-  const activeDest = destinations.find((d: any) => getSlug(d.name) === activeSlug);
+  const safeDests = Array.isArray(destinations) ? destinations : [];
+  const activeDest = safeDests.find((d: any) => getSlug(d.name) === activeSlug);
   const activeDetails = activeSlug ? db[activeSlug] || (activeDest ? generateFallbackDetails(activeDest) : emptyDetails) : null;
   const tags = ["All", "International", "Beach", "Adventure", "Luxury", "Family", "Honeymoon", "Group Tours"];
-  const filtered = destinations.filter((d: any) => {
+  const filtered = safeDests.filter((d: any) => {
     const matchQ = d.name.toLowerCase().includes(searchQ.toLowerCase()) || d.country.toLowerCase().includes(searchQ.toLowerCase());
     const matchTag = filterTag === "All" || d.tag === filterTag;
     return matchQ && matchTag;
@@ -1658,13 +1669,13 @@ function PackagesTab({ appData }: { appData: any }) {
                   <div>
                     <label className={S.label}>Highlights List</label>
                     <div className="space-y-2">
-                      {activeDetails.highlights.map((h: string, idx: number) => (
+                      {(activeDetails.highlights || []).map((h: string, idx: number) => (
                         <div key={idx} className="flex gap-2">
-                          <input type="text" value={h} onChange={(e) => { const u = [...activeDetails.highlights]; u[idx] = e.target.value; handleUpdateDetails(activeSlug, { highlights: u }); }} className={S.input} placeholder={`Highlight ${idx + 1}`} />
-                          <button onClick={() => { const u = activeDetails.highlights.filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { highlights: u }); }} className="shrink-0 p-2 rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 transition"><X className="h-4 w-4" /></button>
+                          <input type="text" value={h} onChange={(e) => { const u = [...(activeDetails.highlights || [])]; u[idx] = e.target.value; handleUpdateDetails(activeSlug, { highlights: u }); }} className={S.input} placeholder={`Highlight ${idx + 1}`} />
+                          <button onClick={() => { const u = (activeDetails.highlights || []).filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { highlights: u }); }} className="shrink-0 p-2 rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 transition"><X className="h-4 w-4" /></button>
                         </div>
                       ))}
-                      <button onClick={() => handleUpdateDetails(activeSlug, { highlights: [...activeDetails.highlights, ""] })} className={S.btnSecondary + " mt-1"}><Plus className="h-4 w-4" /> Add Highlight</button>
+                      <button onClick={() => handleUpdateDetails(activeSlug, { highlights: [...(activeDetails.highlights || []), ""] })} className={S.btnSecondary + " mt-1"}><Plus className="h-4 w-4" /> Add Highlight</button>
                     </div>
                   </div>
                 </div>
@@ -1673,20 +1684,20 @@ function PackagesTab({ appData }: { appData: any }) {
               {/* Section 4: Itinerary */}
               <AdminSection title="4. Day-by-Day Itinerary" icon={Layers}>
                 <div className="space-y-3">
-                  {activeDetails.itinerary.map((it: any, idx: number) => (
+                  {(activeDetails.itinerary || []).map((it: any, idx: number) => (
                     <div key={idx} className="rounded-xl border border-slate-100 bg-slate-50 p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-blue-600 uppercase">Day {idx + 1}</span>
-                        <button onClick={() => { const u = activeDetails.itinerary.filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { itinerary: u }); }} className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition"><X className="h-3.5 w-3.5" /></button>
+                        <button onClick={() => { const u = (activeDetails.itinerary || []).filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { itinerary: u }); }} className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition"><X className="h-3.5 w-3.5" /></button>
                       </div>
                       <div className="grid gap-3 sm:grid-cols-3">
-                        <FormField label="Day Label"><input type="text" value={it.day} onChange={(e) => { const u = [...activeDetails.itinerary]; u[idx].day = e.target.value; handleUpdateDetails(activeSlug, { itinerary: u }); }} className={S.input} /></FormField>
-                        <FormField label="Title" className="sm:col-span-2"><input type="text" value={it.title} onChange={(e) => { const u = [...activeDetails.itinerary]; u[idx].title = e.target.value; handleUpdateDetails(activeSlug, { itinerary: u }); }} className={S.input} /></FormField>
-                        <FormField label="Description" className="sm:col-span-3"><textarea rows={2} value={it.desc} onChange={(e) => { const u = [...activeDetails.itinerary]; u[idx].desc = e.target.value; handleUpdateDetails(activeSlug, { itinerary: u }); }} className={S.textarea} /></FormField>
+                        <FormField label="Day Label"><input type="text" value={it.day} onChange={(e) => { const u = [...(activeDetails.itinerary || [])]; u[idx].day = e.target.value; handleUpdateDetails(activeSlug, { itinerary: u }); }} className={S.input} /></FormField>
+                        <FormField label="Title" className="sm:col-span-2"><input type="text" value={it.title} onChange={(e) => { const u = [...(activeDetails.itinerary || [])]; u[idx].title = e.target.value; handleUpdateDetails(activeSlug, { itinerary: u }); }} className={S.input} /></FormField>
+                        <FormField label="Description" className="sm:col-span-3"><textarea rows={2} value={it.desc} onChange={(e) => { const u = [...(activeDetails.itinerary || [])]; u[idx].desc = e.target.value; handleUpdateDetails(activeSlug, { itinerary: u }); }} className={S.textarea} /></FormField>
                       </div>
                     </div>
                   ))}
-                  <button onClick={() => handleUpdateDetails(activeSlug, { itinerary: [...activeDetails.itinerary, { day: `Day ${activeDetails.itinerary.length + 1}`, title: "", desc: "" }] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add Day</button>
+                  <button onClick={() => handleUpdateDetails(activeSlug, { itinerary: [...(activeDetails.itinerary || []), { day: `Day ${(activeDetails.itinerary || []).length + 1}`, title: "", desc: "" }] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add Day</button>
                 </div>
               </AdminSection>
 
@@ -1696,25 +1707,25 @@ function PackagesTab({ appData }: { appData: any }) {
                   <div>
                     <label className={S.label}>✅ Inclusions</label>
                     <div className="space-y-2">
-                      {activeDetails.inclusions.map((inc: string, idx: number) => (
+                      {(activeDetails.inclusions || []).map((inc: string, idx: number) => (
                         <div key={idx} className="flex gap-2">
-                          <input type="text" value={inc} onChange={(e) => { const u = [...activeDetails.inclusions]; u[idx] = e.target.value; handleUpdateDetails(activeSlug, { inclusions: u }); }} className={S.input} placeholder="Included item" />
-                          <button onClick={() => { const u = activeDetails.inclusions.filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { inclusions: u }); }} className="shrink-0 p-2 rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 transition"><X className="h-4 w-4" /></button>
+                          <input type="text" value={inc} onChange={(e) => { const u = [...(activeDetails.inclusions || [])]; u[idx] = e.target.value; handleUpdateDetails(activeSlug, { inclusions: u }); }} className={S.input} placeholder="Included item" />
+                          <button onClick={() => { const u = (activeDetails.inclusions || []).filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { inclusions: u }); }} className="shrink-0 p-2 rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 transition"><X className="h-4 w-4" /></button>
                         </div>
                       ))}
-                      <button onClick={() => handleUpdateDetails(activeSlug, { inclusions: [...activeDetails.inclusions, ""] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add</button>
+                      <button onClick={() => handleUpdateDetails(activeSlug, { inclusions: [...(activeDetails.inclusions || []), ""] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add</button>
                     </div>
                   </div>
                   <div>
                     <label className={S.label}>❌ Exclusions</label>
                     <div className="space-y-2">
-                      {activeDetails.exclusions.map((exc: string, idx: number) => (
+                      {(activeDetails.exclusions || []).map((exc: string, idx: number) => (
                         <div key={idx} className="flex gap-2">
-                          <input type="text" value={exc} onChange={(e) => { const u = [...activeDetails.exclusions]; u[idx] = e.target.value; handleUpdateDetails(activeSlug, { exclusions: u }); }} className={S.input} placeholder="Excluded item" />
-                          <button onClick={() => { const u = activeDetails.exclusions.filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { exclusions: u }); }} className="shrink-0 p-2 rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 transition"><X className="h-4 w-4" /></button>
+                          <input type="text" value={exc} onChange={(e) => { const u = [...(activeDetails.exclusions || [])]; u[idx] = e.target.value; handleUpdateDetails(activeSlug, { exclusions: u }); }} className={S.input} placeholder="Excluded item" />
+                          <button onClick={() => { const u = (activeDetails.exclusions || []).filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { exclusions: u }); }} className="shrink-0 p-2 rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 transition"><X className="h-4 w-4" /></button>
                         </div>
                       ))}
-                      <button onClick={() => handleUpdateDetails(activeSlug, { exclusions: [...activeDetails.exclusions, ""] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add</button>
+                      <button onClick={() => handleUpdateDetails(activeSlug, { exclusions: [...(activeDetails.exclusions || []), ""] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add</button>
                     </div>
                   </div>
                 </div>
@@ -1723,20 +1734,20 @@ function PackagesTab({ appData }: { appData: any }) {
               {/* Section 6: Hotels */}
               <AdminSection title="6. Accommodation / Hotels" icon={Briefcase}>
                 <div className="space-y-3">
-                  {activeDetails.hotels.map((hotel: any, idx: number) => (
+                  {(activeDetails.hotels || []).map((hotel: any, idx: number) => (
                     <div key={idx} className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-xs font-bold text-blue-600 uppercase">Hotel {idx + 1}</span>
-                        <button onClick={() => { const u = activeDetails.hotels.filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { hotels: u }); }} className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition"><X className="h-3.5 w-3.5" /></button>
+                        <button onClick={() => { const u = (activeDetails.hotels || []).filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { hotels: u }); }} className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition"><X className="h-3.5 w-3.5" /></button>
                       </div>
                       <div className="grid gap-3 sm:grid-cols-3">
-                        <FormField label="Hotel Name" className="sm:col-span-2"><input type="text" value={hotel.name} onChange={(e) => { const u = [...activeDetails.hotels]; u[idx].name = e.target.value; handleUpdateDetails(activeSlug, { hotels: u }); }} className={S.input} /></FormField>
-                        <FormField label="Stars"><input type="number" min={1} max={5} value={hotel.stars} onChange={(e) => { const u = [...activeDetails.hotels]; u[idx].stars = parseInt(e.target.value) || 5; handleUpdateDetails(activeSlug, { hotels: u }); }} className={S.input} /></FormField>
-                        <FormField label="Location" className="sm:col-span-3"><input type="text" value={hotel.location} onChange={(e) => { const u = [...activeDetails.hotels]; u[idx].location = e.target.value; handleUpdateDetails(activeSlug, { hotels: u }); }} className={S.input} /></FormField>
+                        <FormField label="Hotel Name" className="sm:col-span-2"><input type="text" value={hotel.name} onChange={(e) => { const u = [...(activeDetails.hotels || [])]; u[idx].name = e.target.value; handleUpdateDetails(activeSlug, { hotels: u }); }} className={S.input} /></FormField>
+                        <FormField label="Stars"><input type="number" min={1} max={5} value={hotel.stars} onChange={(e) => { const u = [...(activeDetails.hotels || [])]; u[idx].stars = parseInt(e.target.value) || 5; handleUpdateDetails(activeSlug, { hotels: u }); }} className={S.input} /></FormField>
+                        <FormField label="Location" className="sm:col-span-3"><input type="text" value={hotel.location} onChange={(e) => { const u = [...(activeDetails.hotels || [])]; u[idx].location = e.target.value; handleUpdateDetails(activeSlug, { hotels: u }); }} className={S.input} /></FormField>
                       </div>
                     </div>
                   ))}
-                  <button onClick={() => handleUpdateDetails(activeSlug, { hotels: [...activeDetails.hotels, { name: "", stars: 5, location: "" }] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add Hotel</button>
+                  <button onClick={() => handleUpdateDetails(activeSlug, { hotels: [...(activeDetails.hotels || []), { name: "", stars: 5, location: "" }] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add Hotel</button>
                 </div>
               </AdminSection>
 
@@ -1752,17 +1763,17 @@ function PackagesTab({ appData }: { appData: any }) {
               {/* Section 8: FAQs */}
               <AdminSection title="8. Package FAQs" icon={HelpCircle}>
                 <div className="space-y-3">
-                  {activeDetails.faqs.map((faq: any, idx: number) => (
+                  {(activeDetails.faqs || []).map((faq: any, idx: number) => (
                     <div key={idx} className="rounded-xl border border-slate-100 bg-slate-50 p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-blue-600 uppercase">FAQ {idx + 1}</span>
-                        <button onClick={() => { const u = activeDetails.faqs.filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { faqs: u }); }} className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition"><X className="h-3.5 w-3.5" /></button>
+                        <button onClick={() => { const u = (activeDetails.faqs || []).filter((_: any, i: number) => i !== idx); handleUpdateDetails(activeSlug, { faqs: u }); }} className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition"><X className="h-3.5 w-3.5" /></button>
                       </div>
-                      <FormField label="Question"><input type="text" value={faq.q} onChange={(e) => { const u = [...activeDetails.faqs]; u[idx].q = e.target.value; handleUpdateDetails(activeSlug, { faqs: u }); }} className={S.input} /></FormField>
-                      <FormField label="Answer"><textarea rows={2} value={faq.a} onChange={(e) => { const u = [...activeDetails.faqs]; u[idx].a = e.target.value; handleUpdateDetails(activeSlug, { faqs: u }); }} className={S.textarea} /></FormField>
+                      <FormField label="Question"><input type="text" value={faq.q} onChange={(e) => { const u = [...(activeDetails.faqs || [])]; u[idx].q = e.target.value; handleUpdateDetails(activeSlug, { faqs: u }); }} className={S.input} /></FormField>
+                      <FormField label="Answer"><textarea rows={2} value={faq.a} onChange={(e) => { const u = [...(activeDetails.faqs || [])]; u[idx].a = e.target.value; handleUpdateDetails(activeSlug, { faqs: u }); }} className={S.textarea} /></FormField>
                     </div>
                   ))}
-                  <button onClick={() => handleUpdateDetails(activeSlug, { faqs: [...activeDetails.faqs, { q: "", a: "" }] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add FAQ</button>
+                  <button onClick={() => handleUpdateDetails(activeSlug, { faqs: [...(activeDetails.faqs || []), { q: "", a: "" }] })} className={S.btnSecondary}><Plus className="h-4 w-4" /> Add FAQ</button>
                 </div>
               </AdminSection>
 

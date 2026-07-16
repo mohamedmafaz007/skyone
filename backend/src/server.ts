@@ -1,4 +1,4 @@
-import "dotenv/config";
+// Environment variables are loaded via --env-file=.env in the npm script (Node 20+ native)
 import express from "express";
 import cors from "cors";
 import fileUpload from "express-fileupload";
