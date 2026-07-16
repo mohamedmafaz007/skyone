@@ -198,7 +198,7 @@ export const STATIC_DEFAULTS = {
       hotels: [
         { name: "Alaya Resort Ubud / The Haven Seminyak", stars: 5, location: "Ubud & Seminyak, Bali" }
       ],
-      transportation: "Private air-conditioned SUV for land travel, speedboats for Nusa Penida island crossing.",
+      transportation: "Hotels are subject to availability; alternatives of similar",
       visaInfo: "Visa on Arrival (VoA) is available for 80+ nationalities (IDR 500,000 / ~USD 35). SkyNow Holiday consultants assist in pre-filling electronic custom declarations.",
       bestTime: "April to October (Dry season with low humidity, clear skies, and gentle breezes).",
       faqs: [

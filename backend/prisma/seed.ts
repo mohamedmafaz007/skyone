@@ -58,7 +58,7 @@ function generateFallbackDetails(d: any) {
       { name: `The Grand Palace Hotel ${name}`, stars: 5, location: "Central District" },
       { name: `Royal Oasis Resort & Spa`, stars: 5, location: "Coastal Area" }
     ],
-    transportation: "Private air-conditioned luxury sedan, VIP SUV, or business van.",
+    transportation: "Hotels are subject to availability; alternatives of similar",
     visaInfo: "Visa guidelines vary by nationality. Our documentation specialists handle all applications, appointment bookings, and pre-travel checklist updates.",
     bestTime: "Spring and Autumn months are ideal, presenting pleasant temperatures and minimal rainfall.",
     faqs: [

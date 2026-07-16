@@ -82,24 +82,30 @@ function fallbackParseItinerary(text: string): any {
     })).slice(0, 12);
   }
 
+  const parseList = (sectionText: string): string[] => {
+    if (!sectionText) return [];
+    if (sectionText.includes('\n')) {
+      return sectionText
+        .split('\n')
+        .map((l: string) => l.replace(/^[-•✓✗✅❌*\d.]+\s*/, '').trim())
+        .filter((l: string) => l.length > 2);
+    }
+    return sectionText
+      .split(/[,;]/)
+      .map((item: string) => item.trim())
+      .filter((item: string) => item.length > 2);
+  };
+
   // Inclusions
-  const inclSection = t.match(/inclusions?[:\s]*\n([\s\S]+?)(?=\nexclusions?\s*:|\nhotels?\s*:|\nvisa|\nbest\s*time|\n#|$)/i);
+  const inclSection = t.match(/(?:inclusions?|includes?|what's\s*included|included)[:\s]*\r?\n([\s\S]+?)(?=\r?\n(?:exclusions?|excludes?|what's\s*excluded|excluded|hotels?|stays?|accommodation|transport|visa|best\s*time|#|$))/i);
   if (inclSection) {
-    result.inclusions = inclSection[1]
-      .split('\n')
-      .map((l: string) => l.replace(/^[-•✓✅*\d.]+\s*/, '').trim())
-      .filter((l: string) => l.length > 3)
-      .slice(0, 12);
+    result.inclusions = parseList(inclSection[1]).slice(0, 12);
   }
 
   // Exclusions
-  const exclSection = t.match(/exclusions?[:\s]*\n([\s\S]+?)(?=\ninclusions?\s*:|\nhotels?\s*:|\nvisa|\nbest\s*time|\n#|$)/i);
+  const exclSection = t.match(/(?:exclusions?|excludes?|what's\s*excluded|excluded)[:\s]*\r?\n([\s\S]+?)(?=\r?\n(?:inclusions?|includes?|what's\s*included|included|hotels?|stays?|accommodation|transport|visa|best\s*time|#|$))/i);
   if (exclSection) {
-    result.exclusions = exclSection[1]
-      .split('\n')
-      .map((l: string) => l.replace(/^[-•✗❌*\d.]+\s*/, '').trim())
-      .filter((l: string) => l.length > 3)
-      .slice(0, 10);
+    result.exclusions = parseList(exclSection[1]).slice(0, 10);
   }
 
   // Hotels
