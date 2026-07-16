@@ -52,7 +52,8 @@ import {
   Moon,
   Sun,
   Award,
-  Check
+  Check,
+  Sparkles
 } from "lucide-react";
 import { useAppData, IconMap, STATIC_DEFAULTS } from "@/lib/dataStore";
 import { getSlug, generateFallbackDetails } from "@/components/skynow/packageDetailsData";
