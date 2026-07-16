@@ -383,9 +383,9 @@ function AdminPage() {
             </div>
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-blue-200/60 block mb-1.5">Username</label>
-                <input type="text" required value={username} onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin"
+                <label className="text-xs font-semibold uppercase tracking-wide text-blue-200/60 block mb-1.5">Email Address</label>
+                <input type="email" required value={username} onChange={(e) => setUsername(e.target.value)}
+                  placeholder="admin@skynowholidays.com"
                   className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-blue-400 focus:bg-white/15 transition" />
               </div>
               <div>
@@ -397,9 +397,6 @@ function AdminPage() {
               <button type="submit" className="w-full mt-2 rounded-xl bg-blue-600 hover:bg-blue-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/30 transition-all active:scale-98">
                 Sign In to Dashboard
               </button>
-              <p className="text-center text-[11px] text-blue-200/40 mt-2">
-                Demo: <span className="font-mono text-blue-300">admin</span> / <span className="font-mono text-blue-300">admin123</span>
-              </p>
             </form>
           </div>
         </motion.div>
