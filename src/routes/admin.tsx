@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { motion, AnimatePresence } from "framer-motion";
@@ -57,6 +57,7 @@ import {
 } from "lucide-react";
 import { useAppData, IconMap, STATIC_DEFAULTS } from "@/lib/dataStore";
 import { getSlug, generateFallbackDetails } from "@/components/skynow/packageDetailsData";
+import logoUrl from "@/assets/FINAL-removebg-preview.png";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -1256,6 +1257,17 @@ function PackagesTab({ appData }: { appData: any }) {
   const [pdfEmergencyContact, setPdfEmergencyContact] = useState("+91 98765 43210");
   const [pdfDarkMode, setPdfDarkMode] = useState(false);
   const [pdfImages, setPdfImages] = useState<string[]>([]);
+  const [pdfConsultantName, setPdfConsultantName] = useState("Ramya Soldja");
+  const [pdfConsultantPhone, setPdfConsultantPhone] = useState("9677888562");
+  const [pdfTravelerPhone, setPdfTravelerPhone] = useState("+91 73058 21228");
+  const [pdfTripId, setPdfTripId] = useState("OTTH5967");
+  const [pdfRoomsCount, setPdfRoomsCount] = useState("6 Rooms");
+  const [pdfExtraBeds, setPdfExtraBeds] = useState("2 Extra Beds");
+  const [pdfMealPlan, setPdfMealPlan] = useState("CP (Breakfast)");
+  const [pdfPickupLocation, setPdfPickupLocation] = useState("DMK Airport");
+  const [pdfDropLocation, setPdfDropLocation] = useState("DMK Airport");
+  const [pdfVehicleType, setPdfVehicleType] = useState("Private Sedan / SUV");
+  const [pdfKidsAge, setPdfKidsAge] = useState("10");
 
   const emptyDetails = {
     overview: "", highlights: [""], itinerary: [{ day: "Day 1", title: "", desc: "" }],
@@ -1465,6 +1477,44 @@ function PackagesTab({ appData }: { appData: any }) {
   };
 
   // AI: convert to PDF print view
+  // Helper to map contextual high-resolution travel images
+  const getContextualImage = (text: string, fallbackKeyword: string): string => {
+    const t = (text || "").toLowerCase();
+    if (t.includes("switzerland") || t.includes("zurich") || t.includes("lucerne") || t.includes("swiss")) {
+      const swiss = [
+        "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1527668752968-14dc70a27443?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1502404648342-c34503001876?auto=format&fit=crop&w=800&q=80"
+      ];
+      return swiss[Math.floor(Math.random() * swiss.length)];
+    }
+    if (t.includes("thailand") || t.includes("bangkok") || t.includes("pattaya") || t.includes("phuket") || t.includes("krabi")) {
+      if (t.includes("coral") || t.includes("beach") || t.includes("island")) {
+        return "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=800&q=80";
+      }
+      if (t.includes("safari") || t.includes("zoo") || t.includes("tiger")) {
+        return "https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=800&q=80";
+      }
+      if (t.includes("hotel") || t.includes("stay") || t.includes("resort") || t.includes("room")) {
+        return "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80";
+      }
+      return "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80";
+    }
+    if (t.includes("bali") || t.includes("ubud") || t.includes("seminyak")) {
+      return "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80";
+    }
+    if (t.includes("maldives")) {
+      return "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=800&q=80";
+    }
+    if (t.includes("dubai")) {
+      return "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80";
+    }
+    if (t.includes("singapore")) {
+      return "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=800&q=80";
+    }
+    return `https://images.unsplash.com/featured/800x600/?${encodeURIComponent(fallbackKeyword || "travel")},luxury`;
+  };
+
   const openPdfWorkspace = () => {
     if (!activeSlug || !activeDest) { toast.error("Select a package first."); return; }
     const d = activeDetails;
@@ -1478,13 +1528,30 @@ function PackagesTab({ appData }: { appData: any }) {
       setPdfBudget(activeDest.price);
     }
     
-    const destName = activeDest.name || "Switzerland";
+    // Set custom Outbound Travelers document names
+    setPdfTravelerName("ROJA");
+    setPdfTravelDates("Jul 27 - Aug 1, 2026");
+    setPdfStartingCity("Bangkok");
+    setPdfTripId("OTTH" + Math.floor(1000 + Math.random() * 9000));
+    setPdfConsultantName("Ramya Soldja");
+    setPdfConsultantPhone("9677888562");
+    setPdfTravelerPhone("+91 73058 21228");
+    setPdfRoomsCount("6 Rooms");
+    setPdfExtraBeds("2 Extra Beds");
+    setPdfMealPlan("CP (Breakfast)");
+    setPdfPickupLocation("DMK Airport");
+    setPdfDropLocation("DMK Airport");
+    setPdfVehicleType("Private air-conditioned SUV");
+    setPdfKidsAge("10");
+
+    const destName = activeDest.name || "Thailand";
     const newImages = [
-      activeDest.image || `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},scenic,luxury`,
-      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},nature,travel`,
-      `https://images.unsplash.com/featured/1200x800/?luxury,hotel,resort`,
-      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},landmark`,
-      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},sunset`
+      activeDest.image || getContextualImage(destName, "scenic"),
+      getContextualImage(destName + " nature", "sightseeing"),
+      getContextualImage("luxury resort room", "hotel"),
+      getContextualImage("modern bedroom suite", "room"),
+      getContextualImage(destName + " landmarks", "sunset"),
+      getContextualImage("beach tropical vacation", "beach")
     ];
     setPdfImages(newImages);
     setPdfWorkspaceOpen(true);
@@ -1495,621 +1562,503 @@ function PackagesTab({ appData }: { appData: any }) {
   };
 
   const handleRegenerateImages = () => {
-    const destName = activeDest?.name || "Switzerland";
+    const destName = activeDest?.name || "Thailand";
     const timestamp = Date.now();
     const newImages = [
-      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},scenic,luxury?t=${timestamp}`,
-      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},nature,travel?t=${timestamp}`,
-      `https://images.unsplash.com/featured/1200x800/?luxury,hotel,resort?t=${timestamp}`,
-      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},landmark?t=${timestamp}`,
-      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},sunset?t=${timestamp}`
+      `https://images.unsplash.com/featured/800x600/?${encodeURIComponent(destName)},scenic?t=${timestamp}`,
+      `https://images.unsplash.com/featured/800x600/?${encodeURIComponent(destName)},landmarks?t=${timestamp}`,
+      `https://images.unsplash.com/featured/800x600/?luxury,hotel?t=${timestamp}`,
+      `https://images.unsplash.com/featured/800x600/?luxury,room?t=${timestamp}`,
+      `https://images.unsplash.com/featured/800x600/?${encodeURIComponent(destName)},nature?t=${timestamp}`,
+      `https://images.unsplash.com/featured/800x600/?${encodeURIComponent(destName)},beach?t=${timestamp}`
     ];
     setPdfImages(newImages);
-    toast.success("Regenerated high-quality landscape images!");
+    toast.success("Regenerated high-quality contextual images!");
   };
 
   const handleRegenerateAiText = () => {
     toast.info("Generating luxury copywriting with Gemini...");
-    const destName = activeDest?.name || "Switzerland";
-    const upgradedOverview = `Embark on an extraordinary bespoke journey to ${destName}. Crafted exclusively for the discerning traveler, this premium travel proposal showcases the very best of ${destName}'s cultural depth, visual spectacles, and handpicked luxury resorts. Backed by SkyNow Holidays' signature 24/7 dedicated local concierge support, you will enjoy a seamless, high-end travel experience of a lifetime.`;
+    const destName = activeDest?.name || "Destination";
+    const upgradedOverview = `A meticulously structured bespoke vacation exploring the highlight destinations of ${destName}. Designed for ultimate leisure and adventure, this premium tour features private airport transfers, select hotel stays, guided excursions, and dedicated on-trip coordination.`;
     setPdfOverview(upgradedOverview);
-    toast.success("Successfully rewritten with luxury travel agency tone!");
+    toast.success("Successfully rewritten with travel consultant tone!");
   };
 
   const triggerPrintProposal = () => {
     const win = window.open("", "_blank");
     if (!win) return;
-    
-    const pagesHtml = [];
+
+    const pagesHtml: string[] = [];
     for (let i = 1; i <= 10; i++) {
       const pageEl = document.getElementById(`pdf-page-${i}`);
       if (pageEl) {
         pagesHtml.push(`<div class="a4-page">${pageEl.innerHTML}</div>`);
       }
     }
-    
-    win.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Luxury Travel Proposal - ${activeDest?.name || "Proposal"}</title>
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap');
-          
-          @page {
-            size: A4 portrait;
-            margin: 0;
-          }
-          
-          html, body {
-            margin: 0;
-            padding: 0;
-            width: 210mm;
-            height: 100%;
-            font-family: 'Poppins', sans-serif;
-            color: #1f2937;
-            background: #ffffff;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-          }
-          
-          .a4-page {
-            width: 210mm;
-            height: 297mm;
-            page-break-after: always;
-            break-after: page;
-            position: relative;
-            overflow: hidden;
-            box-sizing: border-box;
-            padding: 20mm;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background: #ffffff;
-          }
-          
-          .a4-page:nth-child(1), .a4-page:nth-child(10) {
-            background-color: #022c22 !important;
-            color: #ffffff !important;
-            border: 4mm solid #cca43b !important;
-          }
-          
-          .z-10 { position: relative; z-index: 10; }
-          .absolute { position: absolute; }
-          .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-          .bg-cover { background-size: cover; }
-          .bg-center { background-position: center; }
-          .mix-blend-overlay { mix-blend-mode: overlay; }
-          .opacity-30 { opacity: 0.3; }
-          .opacity-50 { opacity: 0.5; }
-          .flex { display: flex; }
-          .flex-col { flex-direction: column; }
-          .justify-between { justify-content: space-between; }
-          .items-center { align-items: center; }
-          .items-start { align-items: flex-start; }
-          .gap-2 { gap: 8px; }
-          .gap-3 { gap: 12px; }
-          .gap-4 { gap: 16px; }
-          .gap-6 { gap: 24px; }
-          .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-          .text-center { text-align: center; }
-          .text-right { text-align: right; }
-          .mx-auto { margin-left: auto; margin-right: auto; }
-          .my-auto { margin-top: auto; margin-bottom: auto; }
-          
-          h1, h2, h3, h4, .font-serif {
-            font-family: 'Playfair Display', serif;
-          }
-          h1 { font-size: 32pt; font-weight: bold; margin: 0; }
-          h2 { font-size: 20pt; font-weight: bold; margin: 0; }
-          h3 { font-size: 13pt; font-weight: bold; margin: 0; }
-          p { font-size: 9.5pt; line-height: 1.6; margin: 0; }
-          ul, li { font-size: 9.5pt; line-height: 1.5; margin: 0; }
-          
-          .text-gold { color: #cca43b !important; }
-          .text-white { color: #ffffff !important; }
-          .bg-gold { background-color: #cca43b !important; }
-          .border-gold { border-color: #cca43b !important; }
-          .border-b { border-bottom: 1px solid #e5e7eb; }
-          .pb-4 { padding-bottom: 16px; }
-          .pt-4 { padding-top: 16px; }
-          .border-t { border-top: 1px solid #e5e7eb; }
-          .pt-3 { padding-top: 12px; }
-          .pl-3 { padding-left: 12px; }
-          .pl-4 { padding-left: 16px; }
-          .border-l-4 { border-left: 4px solid #cca43b; }
-          .border-l { border-left: 1px solid #e5e7eb; }
-          .rounded-xl { border-radius: 12px; }
-          .rounded-2xl { border-radius: 16px; }
-          .overflow-hidden { overflow: hidden; }
-          .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-          .bg-white { background-color: #ffffff; }
-          .bg-[#022c22] { background-color: #022c22; }
-          .text-slate-400 { color: #9ca3af; }
-          .text-slate-500 { color: #6b7280; }
-          .text-slate-700 { color: #374151; }
-          .text-slate-800 { color: #1f2937; }
-          .font-semibold { font-weight: 600; }
-          .font-bold { font-weight: 700; }
-          .font-light { font-weight: 300; }
-          .italic { font-style: italic; }
-          .uppercase { text-transform: uppercase; }
-          .tracking-widest { letter-spacing: 0.1em; }
-          .tracking-wider { letter-spacing: 0.05em; }
-          .w-16 { width: 64px; }
-          .h-0.5 { height: 2px; }
-          .h-24 { height: 96px; }
-          .w-24 { width: 96px; }
-          .h-28 { height: 112px; }
-          .h-16 { height: 64px; }
-          .h-3 { height: 12px; }
-          .w-3 { width: 12px; }
-          .h-6 { height: 24px; }
-          .w-6 { width: 24px; }
-          .bg-[#022c22]/5 { background-color: rgba(2, 44, 34, 0.05); }
-          .bg-emerald-50 { background-color: #ecfdf5; }
-          .text-emerald-700 { color: #047857; }
-          .text-emerald-600 { color: #059669; }
-          .bg-slate-50 { background-color: #f9fafb; }
-          .bg-slate-200/50 { background-color: rgba(229, 231, 235, 0.5); }
-          .text-red-700 { color: #b91c1c; }
-          .bg-red-50 { background-color: #fef2f2; }
-          .text-red-600 { color: #dc2626; }
-          .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-          
-          @media print {
-            .a4-page {
-              page-break-after: always;
-              break-after: page;
-              margin: 0;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        ${pagesHtml.join("\n")}
-      </body>
-      </html>
-    `);
-    
+
+    const destName = activeDest?.name || "Destination";
+
+    win.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>SkyNow Holidays – ${destName} Itinerary</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+@page{size:A4 portrait;margin:0;}
+html,body{width:210mm;background:#fff;font-family:'Poppins',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.a4-page{width:210mm;min-height:297mm;page-break-after:always;break-after:page;overflow:hidden;position:relative;background:#fff;display:flex;flex-direction:column;}
+img{max-width:100%;display:block;}
+.cover-hero{width:100%;height:300px;object-fit:cover;object-position:center;}
+.page-header{background:#022c22;padding:10px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.page-header img{height:36px;object-fit:contain;}
+.page-header span{color:#cca43b;font-size:8.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.page-content{padding:22px 28px;flex:1;}
+.section-title{font-family:'Playfair Display',serif;font-size:17pt;font-weight:800;color:#022c22;border-left:5px solid #cca43b;padding-left:12px;margin-bottom:16px;}
+.page-footer{background:#022c22;padding:7px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.page-footer span{color:#cca43b;font-size:7.5pt;font-weight:600;}
+.summary-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;}
+.summary-box label{font-size:7.5pt;color:#999;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:3px;}
+.summary-box span{font-size:10pt;font-weight:700;color:#022c22;}
+.day-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.day-header{background:#022c22;padding:9px 16px;display:flex;align-items:center;gap:12px;}
+.day-badge{background:#cca43b;color:#022c22;font-size:8.5pt;font-weight:800;padding:3px 12px;border-radius:20px;white-space:nowrap;}
+.day-ttl{color:#fff;font-size:9pt;font-weight:700;}
+.day-body{padding:10px 16px;font-size:8.5pt;line-height:1.65;color:#374151;}
+.price-tbl,.hotel-tbl{width:100%;border-collapse:collapse;font-size:9pt;}
+.price-tbl th,.hotel-tbl th{background:#022c22;color:#cca43b;padding:9px 12px;font-weight:700;font-size:8pt;text-transform:uppercase;letter-spacing:1px;}
+.hotel-tbl th{background:#cca43b;color:#022c22;}
+.price-tbl td,.hotel-tbl td{padding:8px 12px;border-bottom:1px solid #f1f5f9;font-size:8.5pt;}
+.price-tbl tr:nth-child(even) td{background:#f8fafc;}
+.hotel-tbl tr:nth-child(even) td{background:#fffbf0;}
+.check-list{list-style:none;padding:0;}
+.check-list li{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:8.5pt;color:#374151;line-height:1.4;}
+.check-icon{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9pt;margin-top:1px;}
+.review-card{background:#f8fafc;border-left:4px solid #cca43b;border-radius:8px;padding:14px;}
+.review-text{font-size:8.5pt;line-height:1.65;color:#374151;font-style:italic;margin-bottom:8px;}
+.review-author{font-size:8pt;font-weight:700;color:#022c22;text-transform:uppercase;letter-spacing:1px;}
+@media print{.a4-page{page-break-after:always;break-after:page;}}
+</style>
+</head>
+<body>${pagesHtml.join("\n")}</body>
+</html>`);
     win.document.close();
-    setTimeout(() => {
-      win.print();
-    }, 1000);
+    setTimeout(() => win.print(), 1200);
   };
 
   const renderA4Sheets = () => {
-    const isDark = pdfDarkMode;
-    const destName = activeDest?.name || "Premium Destination";
+    const destName = activeDest?.name || "Destination";
     const destCountry = activeDest?.country || "";
-    const destDuration = activeDest?.duration || "5 Nights / 6 Days";
-    const bgPrimary = isDark ? "bg-[#06241c] text-white" : "bg-white text-slate-800";
-    const borderPrimary = isDark ? "border-[#cca43b]/40" : "border-slate-100";
-    
+    const destDuration = activeDest?.duration || "5 Days 4 Nights";
+    const coverImg = pdfImages[0] || activeDest?.image || "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=900&q=80";
+
+    const GH = ({ title }: { title: string }) => (
+      <div style={{ background: "#022c22", padding: "10px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <img src={logoUrl} alt="SkyNow Holidays" style={{ height: 36, objectFit: "contain" }} crossOrigin="anonymous" />
+        <span style={{ color: "#cca43b", fontSize: "8.5pt", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase" as const }}>{title}</span>
+      </div>
+    );
+
+    const GF = ({ page }: { page: number }) => (
+      <div style={{ background: "#022c22", padding: "7px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
+        <span style={{ color: "#cca43b", fontSize: "7.5pt", fontWeight: 600 }}>SkyNow Holidays | Your Trusted Travel Partner</span>
+        <span style={{ color: "#cca43b", fontSize: "7.5pt", fontWeight: 600 }}>Page {page} of 10</span>
+      </div>
+    );
+
+    const ST = ({ children }: { children: React.ReactNode }) => (
+      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "17pt", fontWeight: 800, color: "#022c22", borderLeft: "5px solid #cca43b", paddingLeft: 12, marginBottom: 16 }}>
+        {children}
+      </div>
+    );
+
     return (
-      <div className="flex flex-col gap-8 w-full max-w-[700px] shrink-0">
-        {/* PAGE 1: COVER PAGE */}
-        <div id="pdf-page-1" className={`w-full aspect-[1/1.414] shadow-2xl relative overflow-hidden bg-[#022c22] text-white p-12 flex flex-col justify-between border-4 border-[#cca43b]`}>
-          <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-50" style={{ backgroundImage: `url(${pdfImages[0] || activeDest?.image || ""})` }} />
-          
-          <div className="z-10 flex items-center justify-between border-b border-[#cca43b]/30 pb-4">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#cca43b]">SkyNow Premier Travel</span>
-            <span className="rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest bg-[#cca43b]/20 border border-[#cca43b] text-[#cca43b]">Luxury Collection</span>
+      <div className="flex flex-col gap-8 w-full max-w-[680px] shrink-0" style={{ fontFamily: "'Poppins', sans-serif" }}>
+
+        {/* PAGE 1: COVER */}
+        <div id="pdf-page-1" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          {/* Header */}
+          <div style={{ background: "#022c22", padding: "16px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <img src={logoUrl} alt="SkyNow Holidays" style={{ height: 50, objectFit: "contain" }} crossOrigin="anonymous" />
+            <div style={{ textAlign: "right" }}>
+              <div style={{ color: "#cca43b", fontSize: "8pt", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase" as const }}>Travel Itinerary</div>
+              <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "7.5pt", marginTop: 2 }}>{pdfTravelDates}</div>
+            </div>
           </div>
 
-          <div className="z-10 text-center my-auto space-y-6">
-            <h1 className="font-serif text-5xl font-bold tracking-tight text-white leading-tight">
-              {destName}
-            </h1>
-            {destCountry && (
-              <p className="text-xl font-light uppercase tracking-widest text-[#cca43b]">{destCountry}</p>
-            )}
-            <div className="w-16 h-0.5 bg-[#cca43b] mx-auto my-4" />
-            <p className="font-serif italic text-slate-300 text-sm max-w-sm mx-auto">
-              "Travel is the only thing you buy that makes you richer."
-            </p>
+          {/* Hero image */}
+          <div style={{ flex: 1, overflow: "hidden", position: "relative", maxHeight: 285 }}>
+            <img src={coverImg} alt={destName} style={{ width: "100%", height: "100%", objectFit: "cover" }} crossOrigin="anonymous" />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(2,44,34,0.85) 30%, transparent 70%)" }} />
+            {/* Overlaid text on image */}
+            <div style={{ position: "absolute", bottom: 20, left: 28, right: 28 }}>
+              <div style={{ color: "#cca43b", fontFamily: "'Playfair Display', serif", fontSize: "24pt", fontWeight: 800, lineHeight: 1.1 }}>{destName}</div>
+              {destCountry && <div style={{ color: "rgba(255,255,255,0.8)", fontSize: "9pt", letterSpacing: "4px", textTransform: "uppercase" as const, marginTop: 4 }}>{destCountry}</div>}
+            </div>
           </div>
 
-          <div className="z-10 bg-black/40 backdrop-blur-sm border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          {/* Trip badge bar */}
+          <div style={{ background: "#022c22", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
-              <span className="block text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Exclusively Prepared For</span>
-              <span className="text-md font-bold text-white">{pdfTravelerName}</span>
+              <span style={{ display: "inline-block", background: "#cca43b", color: "#022c22", fontSize: "8.5pt", fontWeight: 700, padding: "5px 18px", borderRadius: 20, textTransform: "uppercase" as const, letterSpacing: "1px" }}>
+                TRIP FOR {pdfAdults} Adults{pdfChildren !== "0" ? ` & ${pdfChildren} Children` : ""}
+              </span>
             </div>
-            <div className="text-right">
-              <span className="block text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Duration & Dates</span>
-              <span className="text-xs font-semibold text-[#cca43b]">{destDuration} | {pdfTravelDates}</span>
+            <div style={{ display: "flex", gap: 24 }}>
+              {[
+                { label: "Duration", value: destDuration },
+                { label: "Starting From", value: pdfStartingCity || "Your City" },
+              ].map((item, i) => (
+                <div key={i} style={{ textAlign: "right" as const }}>
+                  <div style={{ fontSize: "7pt", color: "rgba(255,255,255,0.5)", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>{item.label}</div>
+                  <div style={{ fontSize: "9pt", fontWeight: 700, color: "#fff", marginTop: 2 }}>{item.value}</div>
+                </div>
+              ))}
             </div>
+          </div>
+
+          {/* Bottom details strip */}
+          <div style={{ background: "#fff", padding: "12px 28px", borderTop: "3px solid #cca43b", display: "flex", gap: 0, alignItems: "center" }}>
+            {[
+              { label: "Tour Period", value: pdfTravelDates },
+              { label: "Hotel Category", value: pdfHotelCategory },
+              { label: "Transport", value: pdfVehicleType || "Private Cab" },
+              { label: "Pickup", value: pdfPickupLocation || pdfStartingCity || "City" },
+            ].map((item, i, arr) => (
+              <div key={i} style={{ flex: 1, borderRight: i < arr.length - 1 ? "1px solid #e2e8f0" : "none", padding: "0 12px" }}>
+                <div style={{ fontSize: "7pt", color: "#999", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>{item.label}</div>
+                <div style={{ fontSize: "8.5pt", fontWeight: 700, color: "#022c22", marginTop: 2 }}>{item.value}</div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* PAGE 2: TRIP SUMMARY */}
-        <div id="pdf-page-2" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
-          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">02 | Trip Summary</span>
-            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
-          </div>
-
-          <div className="my-auto space-y-6">
-            <div className="space-y-3">
-              <h2 className="font-serif text-2xl font-bold text-[#cca43b] border-l-4 border-[#cca43b] pl-3">Trip Overview</h2>
-              <p className="text-xs leading-relaxed text-slate-500 max-h-[180px] overflow-hidden">{pdfOverview || "No overview specified."}</p>
+        {/* PAGE 2: ABOUT SKYNOW */}
+        <div id="pdf-page-2" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column" }}>
+          <GH title="About Us" />
+          <div style={{ padding: "24px 28px", flex: 1 }}>
+            <ST>Welcome to SkyNow Holidays</ST>
+            <div style={{ width: "100%", height: 130, borderRadius: 12, overflow: "hidden", marginBottom: 16 }}>
+              <img src={pdfImages[1] || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80"} alt="Travel" style={{ width: "100%", height: "100%", objectFit: "cover" }} crossOrigin="anonymous" />
             </div>
+            <p style={{ fontSize: "9.5pt", lineHeight: 1.75, color: "#374151" }}>
+              SkyNow Holidays is a trusted name in the travel industry, specializing in customized travel experiences that focus on comfort, quality, and seamless execution at a reasonable price.
+            </p>
+            <p style={{ fontSize: "9.5pt", lineHeight: 1.75, color: "#374151", marginTop: 10 }}>
+              Our expertise extends beyond leisure trips — we also cater to corporate tours, family vacations, honeymoon packages, and group getaways. Whether you dream of exploring the diverse landscapes of India or venturing into international destinations, we make it happen with ease.
+            </p>
+            <div style={{ background: "#f0fdf4", borderLeft: "4px solid #022c22", padding: "12px 16px", borderRadius: 4, margin: "14px 0" }}>
+              <div style={{ fontWeight: 700, color: "#022c22", fontSize: "9pt", marginBottom: 6 }}>🌍 Our Destinations</div>
+              <p style={{ fontSize: "9pt", color: "#374151", lineHeight: 1.7 }}>
+                ✔ <strong>India</strong> – From the snow-capped Himalayas to the serene backwaters of Kerala<br />
+                ✔ <strong>International</strong> – Thailand, Maldives, Bali, Vietnam, Malaysia, Singapore, Dubai & Sri Lanka
+              </p>
+            </div>
+            <p style={{ fontSize: "9pt", lineHeight: 1.7, color: "#374151" }}>
+              With highly curated itineraries, premium accommodations, and professional service, we ensure that every journey with us is memorable and hassle-free.
+            </p>
+          </div>
+          <GF page={2} />
+        </div>
 
-            <div className="grid grid-cols-2 gap-6 pt-4">
-              <div className="space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Highlights</h3>
-                <ul className="space-y-2 text-[11px] text-slate-500">
-                  {pdfHighlights.slice(0, 5).map((h, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-[#cca43b] mt-0.5">✓</span>
-                      <span>{h}</span>
-                    </li>
+        {/* PAGE 3: SUMMARY SHEET */}
+        <div id="pdf-page-3" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column" }}>
+          <GH title="Summary Sheet" />
+          <div style={{ padding: "22px 28px", flex: 1 }}>
+            <ST>Trip to {destName}</ST>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+              {[
+                { label: "Destination", value: destName },
+                { label: "Duration", value: destDuration },
+                { label: "No. of Pax", value: `${pdfAdults} Adults${pdfChildren !== "0" ? `, ${pdfChildren} Kids` : ""}` },
+                { label: "Transportation", value: pdfVehicleType || "Private Cab & Bus" },
+                { label: "Tour Period", value: pdfTravelDates },
+                { label: "Pick-up Point", value: pdfStartingCity || "City" },
+              ].map((item, i) => (
+                <div key={i} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: 12 }}>
+                  <div style={{ fontSize: "7.5pt", color: "#999", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "1px", marginBottom: 3 }}>{item.label}</div>
+                  <div style={{ fontSize: "10pt", fontWeight: 700, color: "#022c22" }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+            {/* Weather table */}
+            <div style={{ fontSize: "10pt", fontWeight: 700, color: "#022c22", textTransform: "uppercase" as const, letterSpacing: "1px", borderBottom: "2px solid #cca43b", paddingBottom: 6, marginBottom: 12 }}>Weather Prediction</div>
+            <table style={{ width: "100%", borderCollapse: "collapse" as const, fontSize: "9pt" }}>
+              <thead>
+                <tr>
+                  {["Place", "Highest Temp", "Lowest Temp"].map((h) => (
+                    <th key={h} style={{ background: "#022c22", color: "#cca43b", padding: "9px 14px", textAlign: "left" as const, fontWeight: 700, fontSize: "8pt", textTransform: "uppercase" as const, letterSpacing: "1px" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { place: destName, high: pdfWeather?.split("/")[0]?.trim() || "28°C", low: pdfWeather?.split("/")[1]?.trim() || "18°C" },
+                  { place: "City Area", high: "25°C", low: "16°C" },
+                  { place: "Scenic Region", high: "22°C", low: "13°C" },
+                ].map((row, i) => (
+                  <tr key={i}>
+                    <td style={{ padding: "9px 14px", borderBottom: "1px solid #f1f5f9", color: "#374151", fontWeight: 600, background: i % 2 === 1 ? "#f8fafc" : "#fff" }}>{row.place}</td>
+                    <td style={{ padding: "9px 14px", borderBottom: "1px solid #f1f5f9", color: "#022c22", fontWeight: 700, background: i % 2 === 1 ? "#f8fafc" : "#fff" }}>{row.high}</td>
+                    <td style={{ padding: "9px 14px", borderBottom: "1px solid #f1f5f9", color: "#374151", fontWeight: 600, background: i % 2 === 1 ? "#f8fafc" : "#fff" }}>{row.low}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {pdfOverview && (
+              <div style={{ background: "#fffbf0", border: "1px solid #fde68a", borderRadius: 8, padding: "12px 16px", marginTop: 16 }}>
+                <div style={{ fontSize: "8pt", fontWeight: 700, color: "#92400e", textTransform: "uppercase" as const, letterSpacing: "1px", marginBottom: 6 }}>Trip Overview</div>
+                <p style={{ fontSize: "9pt", lineHeight: 1.65, color: "#374151" }}>{pdfOverview}</p>
+              </div>
+            )}
+          </div>
+          <GF page={3} />
+        </div>
+
+        {/* PAGE 4: ITINERARY Part 1 */}
+        <div id="pdf-page-4" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column" }}>
+          <GH title="Day-Wise Itinerary" />
+          <div style={{ padding: "20px 28px", flex: 1 }}>
+            <ST>Itinerary</ST>
+            {pdfItinerary.slice(0, 3).map((item: any, idx: number) => (
+              <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, marginBottom: 13, overflow: "hidden" }}>
+                <div style={{ background: "#022c22", padding: "9px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+                  <span style={{ background: "#cca43b", color: "#022c22", fontSize: "8.5pt", fontWeight: 800, padding: "3px 12px", borderRadius: 20 }}>{item.day || `Day ${idx + 1}`}</span>
+                  <span style={{ color: "#fff", fontSize: "9pt", fontWeight: 700 }}>{item.title || "Sightseeing & Exploration"}</span>
+                </div>
+                <div style={{ padding: "10px 16px", fontSize: "8.5pt", lineHeight: 1.65, color: "#374151" }}>
+                  <p>{item.desc || "Explore the highlights of the destination with your guide."}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#f0fdf4", borderRadius: 6, padding: "5px 10px", marginTop: 8, width: "fit-content" }}>
+                    <span>🌙</span>
+                    <span style={{ fontSize: "8pt", fontWeight: 600, color: "#022c22" }}>Overnight Stay</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {pdfItinerary.length === 0 && (
+              <div style={{ textAlign: "center" as const, padding: "32px", color: "#999", fontSize: "9pt" }}>
+                Add itinerary days from the left panel.
+              </div>
+            )}
+          </div>
+          <GF page={4} />
+        </div>
+
+        {/* PAGE 5: ITINERARY Part 2 */}
+        <div id="pdf-page-5" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column" }}>
+          <GH title="Day-Wise Itinerary (Continued)" />
+          <div style={{ padding: "20px 28px", flex: 1 }}>
+            {pdfItinerary.slice(3).map((item: any, idx: number) => (
+              <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, marginBottom: 13, overflow: "hidden" }}>
+                <div style={{ background: "#022c22", padding: "9px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+                  <span style={{ background: "#cca43b", color: "#022c22", fontSize: "8.5pt", fontWeight: 800, padding: "3px 12px", borderRadius: 20 }}>{item.day || `Day ${idx + 4}`}</span>
+                  <span style={{ color: "#fff", fontSize: "9pt", fontWeight: 700 }}>{item.title || "Leisure & Departure"}</span>
+                </div>
+                <div style={{ padding: "10px 16px", fontSize: "8.5pt", lineHeight: 1.65, color: "#374151" }}>
+                  <p>{item.desc || "Explore more highlights before departure."}</p>
+                </div>
+              </div>
+            ))}
+            {pdfHighlights.length > 0 && (
+              <div style={{ background: "#fffbf0", border: "1px solid #fde68a", borderRadius: 8, padding: "14px 16px", marginTop: 8 }}>
+                <div style={{ fontSize: "9pt", fontWeight: 700, color: "#92400e", marginBottom: 8, textTransform: "uppercase" as const, letterSpacing: "1px" }}>Trip Highlights</div>
+                <ul style={{ paddingLeft: 18 }}>
+                  {pdfHighlights.slice(0, 6).map((h: string, i: number) => (
+                    <li key={i} style={{ fontSize: "8.5pt", color: "#374151", lineHeight: 1.6, marginBottom: 3 }}>✓ {h}</li>
                   ))}
                 </ul>
               </div>
-
-              <div className="bg-[#022c22]/5 p-4 rounded-xl border border-[#cca43b]/10 space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#cca43b]">Destination Facts</h3>
-                <div className="grid grid-cols-2 gap-3 text-[10px]">
-                  <div>
-                    <span className="block text-[9px] text-slate-400 font-semibold uppercase">Weather</span>
-                    <span className="font-medium text-slate-700">{pdfWeather}</span>
-                  </div>
-                  <div>
-                    <span className="block text-[9px] text-slate-400 font-semibold uppercase">Time Zone</span>
-                    <span className="font-medium text-slate-700">{pdfTimeZone}</span>
-                  </div>
-                  <div>
-                    <span className="block text-[9px] text-slate-400 font-semibold uppercase">Currency</span>
-                    <span className="font-medium text-slate-700">{pdfCurrency}</span>
-                  </div>
-                  <div>
-                    <span className="block text-[9px] text-slate-400 font-semibold uppercase">Language</span>
-                    <span className="font-medium text-slate-700">{pdfLanguage}</span>
-                  </div>
-                </div>
-                <div className="h-16 bg-slate-200/50 rounded-lg overflow-hidden flex items-center justify-center border border-slate-300/40 relative">
-                  <span className="text-[9px] text-slate-400 font-bold tracking-widest uppercase">OpenStreetMap Interactive Link</span>
-                  <div className="absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: `url(${pdfImages[1] || ""})` }} />
-                </div>
-              </div>
-            </div>
+            )}
           </div>
-
-          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
-            SkyNow Premier Travel Concierge Team
-          </div>
+          <GF page={5} />
         </div>
 
-        {/* PAGE 3: HOTELS */}
-        <div id="pdf-page-3" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
-          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">03 | Stays & Accommodation</span>
-            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
-          </div>
+        {/* PAGE 6: PACKAGE COST + ACCOMMODATION */}
+        <div id="pdf-page-6" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column" }}>
+          <GH title="Package Cost & Accommodation" />
+          <div style={{ padding: "20px 28px", flex: 1 }}>
+            <ST>Package Cost</ST>
+            <table style={{ width: "100%", borderCollapse: "collapse" as const, fontSize: "9pt", marginBottom: 22 }}>
+              <thead>
+                <tr>
+                  {["PAX", "BASIC", "ECONOMY", "PREMIUM", "LUXURY"].map((h) => (
+                    <th key={h} style={{ background: "#022c22", color: "#cca43b", padding: "9px 10px", textAlign: "center" as const, fontWeight: 700, fontSize: "8pt", textTransform: "uppercase" as const, letterSpacing: "1px" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { pax: "2 PAX", basic: pdfChildPrice || "₹10,000", eco: pdfAdultPrice || "₹11,000", prem: "₹12,000", lux: "₹14,000" },
+                  { pax: "4 PAX", basic: "₹9,500", eco: "₹10,500", prem: "₹11,500", lux: "₹13,500" },
+                  { pax: "6 PAX", basic: "₹9,000", eco: "₹10,000", prem: "₹11,000", lux: "₹13,000" },
+                ].map((row, i) => (
+                  <tr key={i}>
+                    {[row.pax, row.basic, row.eco, row.prem, row.lux].map((cell, j) => (
+                      <td key={j} style={{ padding: "9px 10px", borderBottom: "1px solid #f1f5f9", color: j === 0 ? "#022c22" : "#374151", fontWeight: j === 0 ? 700 : 600, textAlign: "center" as const, background: i % 2 === 1 ? "#f8fafc" : "#fff" }}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-          <div className="my-auto space-y-4">
-            <div className="space-y-1">
-              <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Bespoke Retreats</h2>
-              <p className="text-[11px] text-slate-400">Handpicked luxury hotels selected for comfort, service, and strategic locations.</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {pdfHotels.slice(0, 4).map((h, i) => (
-                <div key={i} className="border border-slate-100 rounded-xl overflow-hidden shadow-sm bg-white flex flex-col justify-between">
-                  <div className="h-28 bg-cover bg-center relative" style={{ backgroundImage: `url(${pdfImages[2 + (i % 2)] || ""})` }}>
-                    <div className="absolute top-2 right-2 bg-black/55 text-amber-400 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-0.5">
-                      ★ {h.stars || 5}
-                    </div>
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <h3 className="text-xs font-bold text-slate-800 line-clamp-1">{h.name || "Luxury Resort"}</h3>
-                    <p className="text-[10px] text-slate-400 flex items-center gap-1">
-                      <span className="text-[#cca43b]">📍</span> {h.location || "Central District"}
-                    </p>
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      <span className="bg-emerald-50 text-emerald-700 text-[8px] px-1.5 py-0.5 rounded-md font-semibold">Breakfast Included</span>
-                      <span className="bg-slate-50 text-slate-600 text-[8px] px-1.5 py-0.5 rounded-md font-semibold">Free WiFi</span>
-                      <span className="bg-slate-50 text-slate-600 text-[8px] px-1.5 py-0.5 rounded-md font-semibold">Spa & Pool</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {pdfHotels.length === 0 && (
-                <div className="col-span-2 py-8 text-center text-xs text-slate-400 border border-dashed rounded-xl">
-                  No hotel accommodations specified. Standard boutique properties will be loaded.
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
-            Accommodation tier: {pdfHotelCategory}
-          </div>
-        </div>
-
-        {/* PAGE 4: ITINERARY */}
-        <div id="pdf-page-4" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
-          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">04 | Day-by-Day Itinerary</span>
-            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
-          </div>
-
-          <div className="my-auto space-y-6">
-            <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Your Journey</h2>
-
-            <div className="space-y-4 relative pl-4 border-l border-slate-200">
-              {pdfItinerary.slice(0, 4).map((item: any, idx: number) => (
-                <div key={idx} className="relative space-y-1.5">
-                  <span className="absolute -left-[21px] top-1.5 h-3 w-3 rounded-full bg-[#cca43b] border-2 border-white" />
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-[#cca43b] uppercase tracking-wider">{item.day || `Day ${idx + 1}`}</span>
-                    <span className="text-[9px] bg-slate-50 text-slate-400 font-semibold px-2 py-0.5 rounded">Activity Tour Included</span>
-                  </div>
-                  <h3 className="text-xs font-bold text-slate-800">{item.title || "Daily sightseeing details"}</h3>
-                  <p className="text-[10px] text-slate-500 leading-relaxed line-clamp-3">{item.desc || "Details of day's plans."}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
-            Meal Plan: Daily Breakfasts included. Guided lunches on key tours.
-          </div>
-        </div>
-
-        {/* PAGE 5: PRICING */}
-        <div id="pdf-page-5" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
-          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">05 | Investment & Package Pricing</span>
-            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
-          </div>
-
-          <div className="my-auto space-y-6">
-            <div className="space-y-1">
-              <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Pricing Summary</h2>
-              <p className="text-[11px] text-slate-400">Custom tailored quote valid for 7 days from proposal date.</p>
-            </div>
-
-            <div className="bg-[#022c22]/5 border border-[#cca43b]/20 rounded-2xl p-6 space-y-4">
-              <div className="space-y-2.5">
-                <div className="flex justify-between text-xs font-semibold text-slate-700">
-                  <span>Adult Base Rate ({pdfAdults} Guests)</span>
-                  <span>{pdfAdultPrice}</span>
-                </div>
-                {pdfChildren !== "0" && (
-                  <div className="flex justify-between text-xs font-semibold text-slate-700">
-                    <span>Child Base Rate ({pdfChildren} Guests)</span>
-                    <span>{pdfChildPrice}</span>
-                  </div>
+            <ST>Accommodation</ST>
+            <table style={{ width: "100%", borderCollapse: "collapse" as const, fontSize: "9pt" }}>
+              <thead>
+                <tr>
+                  {["Hotel Type", "Hotel Name"].map((h) => (
+                    <th key={h} style={{ background: "#cca43b", color: "#022c22", padding: "9px 14px", textAlign: "left" as const, fontWeight: 800, fontSize: "8pt", textTransform: "uppercase" as const }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {pdfHotels.length > 0 ? pdfHotels.map((h: any, i: number) => (
+                  <tr key={i}>
+                    <td style={{ padding: "9px 14px", borderBottom: "1px solid #f1f5f9", color: "#022c22", fontWeight: 700, background: i % 2 === 1 ? "#fffbf0" : "#fff" }}>
+                      {"★".repeat(h.stars || 3)} {h.stars >= 5 ? "Luxury" : h.stars >= 4 ? "Premium" : h.stars >= 3 ? "Economy" : "Basic"}
+                    </td>
+                    <td style={{ padding: "9px 14px", borderBottom: "1px solid #f1f5f9", color: "#374151", background: i % 2 === 1 ? "#fffbf0" : "#fff" }}>
+                      {h.name || "Hotel / Similar"}{h.location ? ` – ${h.location}` : ""}
+                    </td>
+                  </tr>
+                )) : (
+                  <tr><td colSpan={2} style={{ padding: "16px", textAlign: "center" as const, color: "#999", fontSize: "9pt" }}>Hotels confirmed as per selected tier.</td></tr>
                 )}
-                <div className="flex justify-between text-xs font-semibold text-slate-700">
-                  <span>Taxes & Service Fees</span>
-                  <span>{pdfTaxes}</span>
-                </div>
-                <div className="flex justify-between text-xs font-semibold text-emerald-600">
-                  <span>Special Discounts</span>
-                  <span>-{pdfDiscount}</span>
-                </div>
-              </div>
-
-              <div className="border-t border-slate-200/60 pt-4 flex justify-between items-center">
-                <div>
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase">Grand Total (Inclusive of Taxes)</span>
-                  <span className="text-2xl font-serif font-bold text-[#022c22]">{pdfBudget}</span>
-                </div>
-                <span className="text-[10px] font-semibold bg-[#cca43b] text-white px-3 py-1 rounded-full uppercase tracking-wider">Book Now</span>
-              </div>
-            </div>
-
-            <div className="p-4 border border-slate-100 rounded-xl bg-slate-50 space-y-1">
-              <span className="block text-[10px] text-amber-700 font-bold uppercase tracking-wider">Special Offer Inclusions:</span>
-              <p className="text-[10px] text-slate-500">{pdfOffers}</p>
-            </div>
+              </tbody>
+            </table>
           </div>
-
-          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
-            For modifications or customized payment plans, please contact your concierge.
-          </div>
+          <GF page={6} />
         </div>
 
-        {/* PAGE 6: INCLUSIONS */}
-        <div id="pdf-page-6" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
-          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">06 | What's Included</span>
-            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
-          </div>
-
-          <div className="my-auto space-y-4">
-            <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Services Included</h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              {pdfInclusions.slice(0, 6).map((item, idx) => (
-                <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-white flex items-start gap-3 shadow-xs">
-                  <span className="h-6 w-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0">✓</span>
-                  <div>
-                    <h3 className="text-xs font-semibold text-slate-700 leading-snug">{item}</h3>
-                  </div>
-                </div>
-              ))}
-              {pdfInclusions.length === 0 && (
-                <div className="col-span-2 py-8 text-center text-xs text-slate-400 border border-dashed rounded-xl">
-                  Standard luxury inclusions: Private transport, 5★ Accommodation, and Guides.
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
-            Complimentary airport assistance and welcome gifts are included.
-          </div>
-        </div>
-
-        {/* PAGE 7: EXCLUSIONS */}
-        <div id="pdf-page-7" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
-          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">07 | Exclusions</span>
-            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
-          </div>
-
-          <div className="my-auto space-y-4">
-            <h2 className="font-serif text-2xl font-bold text-red-700">Package Exclusions</h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              {pdfExclusions.slice(0, 6).map((item, idx) => (
-                <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-white flex items-start gap-3 shadow-xs">
-                  <span className="h-6 w-6 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">✗</span>
-                  <div>
-                    <h3 className="text-xs font-semibold text-slate-700 leading-snug">{item}</h3>
-                  </div>
-                </div>
-              ))}
-              {pdfExclusions.length === 0 && (
-                <div className="col-span-2 py-8 text-center text-xs text-slate-400 border border-dashed rounded-xl">
-                  Standard package exclusions: International flights and personal insurance.
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
-            Items not listed under Inclusions are explicitly excluded.
-          </div>
-        </div>
-
-        {/* PAGE 8: TRAVEL ESSENTIALS */}
-        <div id="pdf-page-8" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
-          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">08 | Travel Essentials</span>
-            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
-          </div>
-
-          <div className="my-auto space-y-6">
-            <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Travel Preparation</h2>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Pre-Departure Packing</h3>
-                <ul className="space-y-2 text-[10px] text-slate-500">
-                  <li className="flex items-center gap-2">✔ Passport valid for 6 months</li>
-                  <li className="flex items-center gap-2">✔ Comfortable walking shoes</li>
-                  <li className="flex items-center gap-2">✔ Local currency cash & travel card</li>
-                  <li className="flex items-center gap-2">✔ Destination plug adapter</li>
-                  <li className="flex items-center gap-2">✔ Appropriate seasonal clothing</li>
-                </ul>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Visa Requirements</h3>
-                  <p className="text-[10px] text-slate-500 leading-relaxed">
-                    Visa procedures vary by nationality. Our expert consultants assist with forms, scheduling, and pre-travel check updates.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Local Currency Advice</h3>
-                  <p className="text-[10px] text-slate-500 leading-relaxed">
-                    Major cards are accepted globally, but small cash units are recommended for local vendors and services.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
-            Consult the weather report before packing standard apparel.
-          </div>
-        </div>
-
-        {/* PAGE 9: TERMS & CONDITIONS */}
-        <div id="pdf-page-9" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
-          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">09 | Important Policies</span>
-            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
-          </div>
-
-          <div className="my-auto space-y-6">
-            <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Terms & Conditions</h2>
-
-            <div className="grid grid-cols-2 gap-6 text-[10px] text-slate-500 leading-relaxed">
-              <div className="space-y-3">
-                <h3 className="text-xs font-bold uppercase text-slate-700">Cancellation Policy</h3>
-                <ul className="space-y-1.5 list-disc pl-4">
-                  <li>30 days prior: 15% cancellation fee.</li>
-                  <li>15 days prior: 50% cancellation fee.</li>
-                  <li>7 days prior: 100% cancellation fee.</li>
-                  <li>Flight tickets refund subject to airline rules.</li>
-                </ul>
-              </div>
-
-              <div className="space-y-3">
-                <h3 className="text-xs font-bold uppercase text-slate-700">Payment Policy</h3>
-                <ul className="space-y-1.5 list-disc pl-4">
-                  <li>25% deposit required to initiate bookings.</li>
-                  <li>50% milestone payment 30 days prior.</li>
-                  <li>Balance payment due 15 days before departure.</li>
-                  <li>All prices are nett rate in INR.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
-            Standard travel regulations apply. SkyNow Holidays acts as coordinator.
-          </div>
-        </div>
-
-        {/* PAGE 10: THANK YOU */}
-        <div id="pdf-page-10" className="w-full aspect-[1/1.414] shadow-2xl relative overflow-hidden bg-[#022c22] text-white p-12 flex flex-col justify-between border-4 border-[#cca43b]">
-          <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-30" style={{ backgroundImage: `url(${pdfImages[4] || ""})` }} />
-          
-          <div className="z-10 text-right">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#cca43b]">SkyNow Premier Travel</span>
-          </div>
-
-          <div className="z-10 text-center my-auto space-y-6">
-            <h1 className="font-serif text-5xl font-bold text-white tracking-wider">THANK YOU</h1>
-            <p className="text-xs text-slate-300 tracking-widest uppercase">We look forward to hosting your next journey</p>
-            <div className="w-16 h-0.5 bg-[#cca43b] mx-auto" />
-            
-            <div className="mx-auto h-24 w-24 bg-white p-2 rounded-xl flex items-center justify-center border border-[#cca43b]/40">
-              <svg viewBox="0 0 100 100" className="h-full w-full text-slate-900">
-                <rect x="10" y="10" width="20" height="20" fill="currentColor"/>
-                <rect x="70" y="10" width="20" height="20" fill="currentColor"/>
-                <rect x="10" y="70" width="20" height="20" fill="currentColor"/>
-                <rect x="20" y="20" width="5" height="5" fill="white"/>
-                <rect x="75" y="20" width="5" height="5" fill="white"/>
-                <rect x="20" y="75" width="5" height="5" fill="white"/>
-                <rect x="40" y="40" width="20" height="20" fill="currentColor"/>
-                <rect x="45" y="10" width="10" height="15" fill="currentColor"/>
-                <rect x="75" y="45" width="15" height="10" fill="currentColor"/>
-                <rect x="10" y="45" width="15" height="15" fill="currentColor"/>
-                <rect x="45" y="75" width="15" height="15" fill="currentColor"/>
-              </svg>
-            </div>
-            <p className="text-[10px] text-slate-400">Scan to chat with our concierge team</p>
-          </div>
-
-          <div className="z-10 grid grid-cols-3 gap-4 border-t border-[#cca43b]/30 pt-6 text-[10px]">
+        {/* PAGE 7: INCLUSIONS / EXCLUSIONS */}
+        <div id="pdf-page-7" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column" }}>
+          <GH title="Package Inclusions & Exclusions" />
+          <div style={{ padding: "20px 28px", flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignContent: "start" }}>
+            {/* Includes */}
             <div>
-              <span className="block text-slate-400 font-semibold uppercase">Email Support</span>
-              <span className="font-bold text-white">concierge@skynow.com</span>
+              <div style={{ fontSize: "10pt", fontWeight: 700, color: "#022c22", textTransform: "uppercase" as const, letterSpacing: "1px", borderBottom: "2px solid #16a34a", paddingBottom: 6, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ background: "#dcfce7", color: "#16a34a", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>✓</span>
+                Package Includes
+              </div>
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {(pdfInclusions.length > 0 ? pdfInclusions : [
+                  "Pick up & Drop from hotel to bus stand",
+                  "Bus tickets (to & from destination)",
+                  "2 Nights Accommodation in Deluxe Room",
+                  "Morning Tea & Breakfast daily",
+                  "Half day Local Sightseeing by Private Car",
+                  "All Toll, Taxes, Permits & Parking",
+                ]).map((item: string, i: number) => (
+                  <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "5px 0", borderBottom: "1px solid #f1f5f9", fontSize: "8.5pt", color: "#374151", lineHeight: 1.4 }}>
+                    <span style={{ background: "#dcfce7", color: "#16a34a", borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "9pt", marginTop: 1 }}>✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="text-center">
-              <span className="block text-slate-400 font-semibold uppercase">WhatsApp 24/7</span>
-              <span className="font-bold text-white">{pdfEmergencyContact}</span>
-            </div>
-            <div className="text-right">
-              <span className="block text-slate-400 font-semibold uppercase">Website</span>
-              <span className="font-bold text-white">www.skynowholidays.com</span>
+
+            {/* Excludes */}
+            <div>
+              <div style={{ fontSize: "10pt", fontWeight: 700, color: "#022c22", textTransform: "uppercase" as const, letterSpacing: "1px", borderBottom: "2px solid #dc2626", paddingBottom: 6, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ background: "#fee2e2", color: "#dc2626", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>✗</span>
+                Package Excludes
+              </div>
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {(pdfExclusions.length > 0 ? pdfExclusions : [
+                  "Lunch & personal expenses",
+                  "Entry tickets",
+                  "Adventure activities & snow games",
+                  "Cab charges for unmentioned locations",
+                  "Any expenses of personal nature",
+                ]).map((item: string, i: number) => (
+                  <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "5px 0", borderBottom: "1px solid #f1f5f9", fontSize: "8.5pt", color: "#374151", lineHeight: 1.4 }}>
+                    <span style={{ background: "#fee2e2", color: "#dc2626", borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "9pt", marginTop: 1 }}>✗</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
+          <GF page={7} />
         </div>
+
+        {/* PAGE 8: T&C Part 1 */}
+        <div id="pdf-page-8" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column" }}>
+          <GH title="Terms & Conditions" />
+          <div style={{ padding: "20px 28px", flex: 1 }}>
+            <ST>Terms & Conditions</ST>
+            {[
+              { heading: "1. Booking & Payment", points: ["A minimum deposit of 50% is required to confirm the booking.", "Full payment must be made at the time of check-in at hotel.", "Payments are non-refundable unless stated otherwise."] },
+              { heading: "2. Cancellation & Refund Policy", points: ["Cancellations made 10 days before departure: 30% refund.", "Cancellations made within 02 days of departure: No refund.", "No refunds for unused services, missed flights, or late arrivals."] },
+              { heading: "3. Accommodation & Transportation", points: ["Hotels are subject to availability; alternatives of similar standards may be provided.", "Check-in and check-out times as per hotel policy.", "The company is not liable for delays due to weather, traffic, or road conditions."] },
+              { heading: "4. Itinerary Changes & Force Majeure", points: ["The itinerary is subject to change due to unforeseen circumstances (bad weather, strikes, natural disasters, etc.).", "The company is not responsible for any additional costs due to such changes."] },
+            ].map((s, i) => (
+              <div key={i} style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: "9.5pt", fontWeight: 700, color: "#022c22", marginBottom: 5 }}>{s.heading}</div>
+                <ul style={{ paddingLeft: 18 }}>
+                  {s.points.map((pt, j) => <li key={j} style={{ fontSize: "8.5pt", color: "#374151", lineHeight: 1.65, marginBottom: 3 }}>{pt}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <GF page={8} />
+        </div>
+
+        {/* PAGE 9: T&C Part 2 + Safe Journey */}
+        <div id="pdf-page-9" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column" }}>
+          <GH title="Terms & Conditions" />
+          <div style={{ padding: "20px 28px", flex: 1 }}>
+            {[
+              { heading: "5. Health & Safety", points: ["Travelers must carry valid identity proof and travel documents.", "SkyNow Holidays recommends travel insurance for all trips.", "Persons with medical conditions must consult a physician before travel."] },
+              { heading: "6. Liability & Customer Conduct", points: ["Travelers must follow local laws and regulations.", "Any damage caused to property or vehicle by the traveler will be charged.", "The company is not responsible for loss of belongings or personal negligence."] },
+              { heading: "7. Dispute Resolution", points: ["Any disputes will be resolved under applicable Indian jurisdiction."] },
+            ].map((s, i) => (
+              <div key={i} style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: "9.5pt", fontWeight: 700, color: "#022c22", marginBottom: 5 }}>{s.heading}</div>
+                <ul style={{ paddingLeft: 18 }}>
+                  {s.points.map((pt, j) => <li key={j} style={{ fontSize: "8.5pt", color: "#374151", lineHeight: 1.65, marginBottom: 3 }}>{pt}</li>)}
+                </ul>
+              </div>
+            ))}
+            <div style={{ background: "#022c22", borderRadius: 12, padding: "20px 24px", textAlign: "center" as const, marginTop: 24 }}>
+              <div style={{ color: "#cca43b", fontFamily: "'Playfair Display', serif", fontSize: "16pt", fontWeight: 800 }}>WE WISH YOU A HAPPY & SAFE JOURNEY</div>
+              <img src={logoUrl} alt="SkyNow Holidays" style={{ height: 38, objectFit: "contain", margin: "12px auto 0" }} crossOrigin="anonymous" />
+            </div>
+          </div>
+          <GF page={9} />
+        </div>
+
+        {/* PAGE 10: GUEST REVIEWS */}
+        <div id="pdf-page-10" style={{ width: "100%", aspectRatio: "1/1.414", background: "#fff", boxShadow: "0 8px 40px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column" }}>
+          <GH title="Guest Reviews" />
+          <div style={{ background: "#022c22", padding: "22px 28px", textAlign: "center" as const }}>
+            <div style={{ color: "#cca43b", fontFamily: "'Playfair Display', serif", fontSize: "32pt", fontWeight: 800 }}>4.8 RATING</div>
+            <div style={{ color: "#cca43b", fontSize: "12pt", letterSpacing: "3px", marginBottom: 4 }}>★★★★★</div>
+            <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "8.5pt", letterSpacing: "3px", textTransform: "uppercase" as const }}>350+ Happy Travelers</div>
+          </div>
+          <div style={{ padding: "20px 28px 0" }}>
+            <ST>Guest Reviews</ST>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, padding: "0 28px 20px", flex: 1 }}>
+            {[
+              { text: "The last trip we went on was truly our best one yet! We enjoyed it to the fullest. Our travel partners and guides were amazing — they organized and guided our entire trip in the best way possible. A big thank you to SkyNow Holidays for this wonderful experience!", author: "NRFM Family | Kashmir" },
+              { text: "Everything was perfect. Neat and clean rooms, helpful staff, tasty and hygienic food, wonderful places. It was a great and memorable experience to us.", author: "Mr. Kalai & Friends | Himachal" },
+              { text: "Had a wonderful experience with lots of memories. They provide customization with budget-friendly packages. SkyNow Holidays is highly recommended to everyone who wants to plan a tour.", author: "Mr. & Mrs. Keerthana | Thailand" },
+              { text: "I must say the experience was fantastic. The staff was friendly, knowledgeable, and attentive to all our needs. Their commitment in providing a great experience truly made our trip memorable.", author: "Mr. & Mrs. Shameer Khan | Lakshadweep" },
+            ].map((review, i) => (
+              <div key={i} style={{ background: "#f8fafc", borderLeft: "4px solid #cca43b", borderRadius: 8, padding: "14px" }}>
+                <p style={{ fontSize: "8.5pt", lineHeight: 1.65, color: "#374151", fontStyle: "italic", marginBottom: 8 }}>"{review.text}"</p>
+                <div style={{ fontSize: "8pt", fontWeight: 700, color: "#022c22", textTransform: "uppercase" as const, letterSpacing: "1px" }}>— {review.author}</div>
+              </div>
+            ))}
+          </div>
+          <GF page={10} />
+        </div>
+
       </div>
     );
   };
+
 
   const handleCreatePackage = () => {
     const defaultName = `Draft Package #${Date.now().toString().slice(-4)}`;
@@ -2625,6 +2574,119 @@ function PackagesTab({ appData }: { appData: any }) {
                 </div>
               </div>
 
+              {/* Consultant & Trip Details */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Consultant & Trip Info</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Consultant Name</label>
+                    <input
+                      type="text"
+                      value={pdfConsultantName}
+                      onChange={(e) => setPdfConsultantName(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Consultant Phone</label>
+                    <input
+                      type="text"
+                      value={pdfConsultantPhone}
+                      onChange={(e) => setPdfConsultantPhone(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Traveler Phone</label>
+                    <input
+                      type="text"
+                      value={pdfTravelerPhone}
+                      onChange={(e) => setPdfTravelerPhone(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Trip ID</label>
+                    <input
+                      type="text"
+                      value={pdfTripId}
+                      onChange={(e) => setPdfTripId(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Hotel Stay Details */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Hotel Stay Configuration</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Rooms Count</label>
+                    <input
+                      type="text"
+                      value={pdfRoomsCount}
+                      onChange={(e) => setPdfRoomsCount(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Extra Beds</label>
+                    <input
+                      type="text"
+                      value={pdfExtraBeds}
+                      onChange={(e) => setPdfExtraBeds(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Meal Plan</label>
+                  <input
+                    type="text"
+                    value={pdfMealPlan}
+                    onChange={(e) => setPdfMealPlan(e.target.value)}
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                  />
+                </div>
+              </div>
+
+              {/* Transfer Details */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Transfer Details</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pickup Location</label>
+                    <input
+                      type="text"
+                      value={pdfPickupLocation}
+                      onChange={(e) => setPdfPickupLocation(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Drop Location</label>
+                    <input
+                      type="text"
+                      value={pdfDropLocation}
+                      onChange={(e) => setPdfDropLocation(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Vehicle Type</label>
+                  <input
+                    type="text"
+                    value={pdfVehicleType}
+                    onChange={(e) => setPdfVehicleType(e.target.value)}
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                  />
+                </div>
+              </div>
+
               {/* Tiers & Budget */}
               <div className="space-y-4 pt-4 border-t border-slate-800">
                 <div className="grid grid-cols-2 gap-3">
@@ -2854,7 +2916,7 @@ function PackagesTab({ appData }: { appData: any }) {
             {/* Right preview canvas */}
             <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center gap-12 bg-slate-950 relative">
               <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur border border-slate-800 text-[10px] text-slate-400 px-2.5 py-1 rounded-lg">
-                Live A4 Pages View (10 Sheets Total)
+                Outbound Travelers Style — 7 A4 Pages Preview
               </div>
               
               {/* Render sheets list */}
