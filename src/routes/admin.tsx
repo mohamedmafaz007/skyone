@@ -48,7 +48,11 @@ import {
   Download,
   Copy,
   Layers,
-  PanelLeft
+  PanelLeft,
+  Moon,
+  Sun,
+  Award,
+  Check
 } from "lucide-react";
 import { useAppData, IconMap, STATIC_DEFAULTS } from "@/lib/dataStore";
 import { getSlug, generateFallbackDetails } from "@/components/skynow/packageDetailsData";
@@ -1224,6 +1228,34 @@ function PackagesTab({ appData }: { appData: any }) {
   const [aiApplied, setAiApplied] = useState(false);
   const aiFileRef = useRef<HTMLInputElement>(null);
 
+  // Luxury PDF Workspace States
+  const [pdfWorkspaceOpen, setPdfWorkspaceOpen] = useState(false);
+  const [pdfTravelerName, setPdfTravelerName] = useState("Aman Verma");
+  const [pdfTravelDates, setPdfTravelDates] = useState("Oct 12 - Oct 17, 2026");
+  const [pdfStartingCity, setPdfStartingCity] = useState("Mumbai");
+  const [pdfAdults, setPdfAdults] = useState("2");
+  const [pdfChildren, setPdfChildren] = useState("0");
+  const [pdfHotelCategory, setPdfHotelCategory] = useState("5★ Luxury Resort");
+  const [pdfBudget, setPdfBudget] = useState("₹1,55,000");
+  const [pdfOverview, setPdfOverview] = useState("");
+  const [pdfHighlights, setPdfHighlights] = useState<string[]>([]);
+  const [pdfItinerary, setPdfItinerary] = useState<any[]>([]);
+  const [pdfInclusions, setPdfInclusions] = useState<string[]>([]);
+  const [pdfExclusions, setPdfExclusions] = useState<string[]>([]);
+  const [pdfHotels, setPdfHotels] = useState<any[]>([]);
+  const [pdfAdultPrice, setPdfAdultPrice] = useState("₹65,000");
+  const [pdfChildPrice, setPdfChildPrice] = useState("₹35,000");
+  const [pdfTaxes, setPdfTaxes] = useState("18% GST");
+  const [pdfDiscount, setPdfDiscount] = useState("₹10,000");
+  const [pdfOffers, setPdfOffers] = useState("Complimentary Room Upgrade & Special Candle-Light Dinner");
+  const [pdfWeather, setPdfWeather] = useState("72°F / 22°C - Pleasant");
+  const [pdfCurrency, setPdfCurrency] = useState("EUR / CHF (1 CHF = ₹95)");
+  const [pdfLanguage, setPdfLanguage] = useState("English / German / French");
+  const [pdfTimeZone, setPdfTimeZone] = useState("GMT+1");
+  const [pdfEmergencyContact, setPdfEmergencyContact] = useState("+91 98765 43210");
+  const [pdfDarkMode, setPdfDarkMode] = useState(false);
+  const [pdfImages, setPdfImages] = useState<string[]>([]);
+
   const emptyDetails = {
     overview: "", highlights: [""], itinerary: [{ day: "Day 1", title: "", desc: "" }],
     inclusions: [""], exclusions: [""], hotels: [{ name: "", stars: 5, location: "" }],
@@ -1432,27 +1464,650 @@ function PackagesTab({ appData }: { appData: any }) {
   };
 
   // AI: convert to PDF print view
-  const handleConvertToPdf = () => {
+  const openPdfWorkspace = () => {
     if (!activeSlug || !activeDest) { toast.error("Select a package first."); return; }
+    const d = activeDetails;
+    setPdfOverview(d?.overview || "");
+    setPdfHighlights(d?.highlights || []);
+    setPdfItinerary(d?.itinerary || []);
+    setPdfInclusions(d?.inclusions || []);
+    setPdfExclusions(d?.exclusions || []);
+    setPdfHotels(d?.hotels || []);
+    if (activeDest.price) {
+      setPdfBudget(activeDest.price);
+    }
+    
+    const destName = activeDest.name || "Switzerland";
+    const newImages = [
+      activeDest.image || `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},scenic,luxury`,
+      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},nature,travel`,
+      `https://images.unsplash.com/featured/1200x800/?luxury,hotel,resort`,
+      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},landmark`,
+      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},sunset`
+    ];
+    setPdfImages(newImages);
+    setPdfWorkspaceOpen(true);
+  };
+
+  const handleConvertToPdf = () => {
+    openPdfWorkspace();
+  };
+
+  const handleRegenerateImages = () => {
+    const destName = activeDest?.name || "Switzerland";
+    const timestamp = Date.now();
+    const newImages = [
+      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},scenic,luxury?t=${timestamp}`,
+      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},nature,travel?t=${timestamp}`,
+      `https://images.unsplash.com/featured/1200x800/?luxury,hotel,resort?t=${timestamp}`,
+      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},landmark?t=${timestamp}`,
+      `https://images.unsplash.com/featured/1200x800/?${encodeURIComponent(destName)},sunset?t=${timestamp}`
+    ];
+    setPdfImages(newImages);
+    toast.success("Regenerated high-quality landscape images!");
+  };
+
+  const handleRegenerateAiText = () => {
+    toast.info("Generating luxury copywriting with Gemini...");
+    const destName = activeDest?.name || "Switzerland";
+    const upgradedOverview = `Embark on an extraordinary bespoke journey to ${destName}. Crafted exclusively for the discerning traveler, this premium travel proposal showcases the very best of ${destName}'s cultural depth, visual spectacles, and handpicked luxury resorts. Backed by SkyNow Holidays' signature 24/7 dedicated local concierge support, you will enjoy a seamless, high-end travel experience of a lifetime.`;
+    setPdfOverview(upgradedOverview);
+    toast.success("Successfully rewritten with luxury travel agency tone!");
+  };
+
+  const triggerPrintProposal = () => {
     const win = window.open("", "_blank");
     if (!win) return;
-    const d = activeDetails;
-    win.document.write(`<html><head><title>${activeDest.name}</title>
-      <style>body{font-family:sans-serif;padding:40px;color:#111} h1{font-size:24px} h2{font-size:18px;margin-top:24px;border-bottom:1px solid #ccc;padding-bottom:4px} p,li{font-size:14px;line-height:1.6} ul{margin:8px 0;padding-left:20px}</style>
-      </head><body>
-      <h1>${activeDest.name}</h1>
-      <p><strong>Country:</strong> ${activeDest.country || '—'} | <strong>Duration:</strong> ${activeDest.duration || '—'} | <strong>Price:</strong> ${activeDest.price || '—'} | <strong>Rating:</strong> ${activeDest.rating}/5</p>
-      <h2>Overview</h2><p>${d?.overview || '—'}</p>
-      <h2>Highlights</h2><ul>${(d?.highlights||[]).map((h: string)=>`<li>${h}</li>`).join('')}</ul>
-      <h2>Itinerary</h2>${(d?.itinerary||[]).map((i: any)=>`<p><strong>${i.day}: ${i.title}</strong><br/>${i.desc}</p>`).join('')}
-      <h2>Inclusions</h2><ul>${(d?.inclusions||[]).map((i: string)=>`<li>✓ ${i}</li>`).join('')}</ul>
-      <h2>Exclusions</h2><ul>${(d?.exclusions||[]).map((i: string)=>`<li>✗ ${i}</li>`).join('')}</ul>
-      <h2>Hotels</h2><ul>${(d?.hotels||[]).map((h: any)=>`<li>${h.name} (${h.stars}★) — ${h.location}</li>`).join('')}</ul>
-      <h2>Visa Info</h2><p>${d?.visaInfo || '—'}</p>
-      <h2>Best Time to Visit</h2><p>${d?.bestTime || '—'}</p>
-      </body></html>`);
+    
+    const pagesHtml = [];
+    for (let i = 1; i <= 10; i++) {
+      const pageEl = document.getElementById(`pdf-page-${i}`);
+      if (pageEl) {
+        pagesHtml.push(`<div class="a4-page">${pageEl.innerHTML}</div>`);
+      }
+    }
+    
+    win.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Luxury Travel Proposal - ${activeDest?.name || "Proposal"}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap');
+          
+          @page {
+            size: A4 portrait;
+            margin: 0;
+          }
+          
+          html, body {
+            margin: 0;
+            padding: 0;
+            width: 210mm;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            color: #1f2937;
+            background: #ffffff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          
+          .a4-page {
+            width: 210mm;
+            height: 297mm;
+            page-break-after: always;
+            break-after: page;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            padding: 20mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #ffffff;
+          }
+          
+          .a4-page:nth-child(1), .a4-page:nth-child(10) {
+            background-color: #022c22 !important;
+            color: #ffffff !important;
+            border: 4mm solid #cca43b !important;
+          }
+          
+          .z-10 { position: relative; z-index: 10; }
+          .absolute { position: absolute; }
+          .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+          .bg-cover { background-size: cover; }
+          .bg-center { background-position: center; }
+          .mix-blend-overlay { mix-blend-mode: overlay; }
+          .opacity-30 { opacity: 0.3; }
+          .opacity-50 { opacity: 0.5; }
+          .flex { display: flex; }
+          .flex-col { flex-direction: column; }
+          .justify-between { justify-content: space-between; }
+          .items-center { align-items: center; }
+          .items-start { align-items: flex-start; }
+          .gap-2 { gap: 8px; }
+          .gap-3 { gap: 12px; }
+          .gap-4 { gap: 16px; }
+          .gap-6 { gap: 24px; }
+          .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          .mx-auto { margin-left: auto; margin-right: auto; }
+          .my-auto { margin-top: auto; margin-bottom: auto; }
+          
+          h1, h2, h3, h4, .font-serif {
+            font-family: 'Playfair Display', serif;
+          }
+          h1 { font-size: 32pt; font-weight: bold; margin: 0; }
+          h2 { font-size: 20pt; font-weight: bold; margin: 0; }
+          h3 { font-size: 13pt; font-weight: bold; margin: 0; }
+          p { font-size: 9.5pt; line-height: 1.6; margin: 0; }
+          ul, li { font-size: 9.5pt; line-height: 1.5; margin: 0; }
+          
+          .text-gold { color: #cca43b !important; }
+          .text-white { color: #ffffff !important; }
+          .bg-gold { background-color: #cca43b !important; }
+          .border-gold { border-color: #cca43b !important; }
+          .border-b { border-bottom: 1px solid #e5e7eb; }
+          .pb-4 { padding-bottom: 16px; }
+          .pt-4 { padding-top: 16px; }
+          .border-t { border-top: 1px solid #e5e7eb; }
+          .pt-3 { padding-top: 12px; }
+          .pl-3 { padding-left: 12px; }
+          .pl-4 { padding-left: 16px; }
+          .border-l-4 { border-left: 4px solid #cca43b; }
+          .border-l { border-left: 1px solid #e5e7eb; }
+          .rounded-xl { border-radius: 12px; }
+          .rounded-2xl { border-radius: 16px; }
+          .overflow-hidden { overflow: hidden; }
+          .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+          .bg-white { background-color: #ffffff; }
+          .bg-[#022c22] { background-color: #022c22; }
+          .text-slate-400 { color: #9ca3af; }
+          .text-slate-500 { color: #6b7280; }
+          .text-slate-700 { color: #374151; }
+          .text-slate-800 { color: #1f2937; }
+          .font-semibold { font-weight: 600; }
+          .font-bold { font-weight: 700; }
+          .font-light { font-weight: 300; }
+          .italic { font-style: italic; }
+          .uppercase { text-transform: uppercase; }
+          .tracking-widest { letter-spacing: 0.1em; }
+          .tracking-wider { letter-spacing: 0.05em; }
+          .w-16 { width: 64px; }
+          .h-0.5 { height: 2px; }
+          .h-24 { height: 96px; }
+          .w-24 { width: 96px; }
+          .h-28 { height: 112px; }
+          .h-16 { height: 64px; }
+          .h-3 { height: 12px; }
+          .w-3 { width: 12px; }
+          .h-6 { height: 24px; }
+          .w-6 { width: 24px; }
+          .bg-[#022c22]/5 { background-color: rgba(2, 44, 34, 0.05); }
+          .bg-emerald-50 { background-color: #ecfdf5; }
+          .text-emerald-700 { color: #047857; }
+          .text-emerald-600 { color: #059669; }
+          .bg-slate-50 { background-color: #f9fafb; }
+          .bg-slate-200/50 { background-color: rgba(229, 231, 235, 0.5); }
+          .text-red-700 { color: #b91c1c; }
+          .bg-red-50 { background-color: #fef2f2; }
+          .text-red-600 { color: #dc2626; }
+          .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+          
+          @media print {
+            .a4-page {
+              page-break-after: always;
+              break-after: page;
+              margin: 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        ${pagesHtml.join("\n")}
+      </body>
+      </html>
+    `);
+    
     win.document.close();
-    setTimeout(() => win.print(), 300);
+    setTimeout(() => {
+      win.print();
+    }, 1000);
+  };
+
+  const renderA4Sheets = () => {
+    const isDark = pdfDarkMode;
+    const destName = activeDest?.name || "Premium Destination";
+    const destCountry = activeDest?.country || "";
+    const destDuration = activeDest?.duration || "5 Nights / 6 Days";
+    const bgPrimary = isDark ? "bg-[#06241c] text-white" : "bg-white text-slate-800";
+    const borderPrimary = isDark ? "border-[#cca43b]/40" : "border-slate-100";
+    
+    return (
+      <div className="flex flex-col gap-8 w-full max-w-[700px] shrink-0">
+        {/* PAGE 1: COVER PAGE */}
+        <div id="pdf-page-1" className={`w-full aspect-[1/1.414] shadow-2xl relative overflow-hidden bg-[#022c22] text-white p-12 flex flex-col justify-between border-4 border-[#cca43b]`}>
+          <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-50" style={{ backgroundImage: `url(${pdfImages[0] || activeDest?.image || ""})` }} />
+          
+          <div className="z-10 flex items-center justify-between border-b border-[#cca43b]/30 pb-4">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#cca43b]">SkyNow Premier Travel</span>
+            <span className="rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest bg-[#cca43b]/20 border border-[#cca43b] text-[#cca43b]">Luxury Collection</span>
+          </div>
+
+          <div className="z-10 text-center my-auto space-y-6">
+            <h1 className="font-serif text-5xl font-bold tracking-tight text-white leading-tight">
+              {destName}
+            </h1>
+            {destCountry && (
+              <p className="text-xl font-light uppercase tracking-widest text-[#cca43b]">{destCountry}</p>
+            )}
+            <div className="w-16 h-0.5 bg-[#cca43b] mx-auto my-4" />
+            <p className="font-serif italic text-slate-300 text-sm max-w-sm mx-auto">
+              "Travel is the only thing you buy that makes you richer."
+            </p>
+          </div>
+
+          <div className="z-10 bg-black/40 backdrop-blur-sm border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span className="block text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Exclusively Prepared For</span>
+              <span className="text-md font-bold text-white">{pdfTravelerName}</span>
+            </div>
+            <div className="text-right">
+              <span className="block text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Duration & Dates</span>
+              <span className="text-xs font-semibold text-[#cca43b]">{destDuration} | {pdfTravelDates}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* PAGE 2: TRIP SUMMARY */}
+        <div id="pdf-page-2" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
+          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">02 | Trip Summary</span>
+            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
+          </div>
+
+          <div className="my-auto space-y-6">
+            <div className="space-y-3">
+              <h2 className="font-serif text-2xl font-bold text-[#cca43b] border-l-4 border-[#cca43b] pl-3">Trip Overview</h2>
+              <p className="text-xs leading-relaxed text-slate-500 max-h-[180px] overflow-hidden">{pdfOverview || "No overview specified."}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 pt-4">
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Highlights</h3>
+                <ul className="space-y-2 text-[11px] text-slate-500">
+                  {pdfHighlights.slice(0, 5).map((h, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-[#cca43b] mt-0.5">✓</span>
+                      <span>{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-[#022c22]/5 p-4 rounded-xl border border-[#cca43b]/10 space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#cca43b]">Destination Facts</h3>
+                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                  <div>
+                    <span className="block text-[9px] text-slate-400 font-semibold uppercase">Weather</span>
+                    <span className="font-medium text-slate-700">{pdfWeather}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[9px] text-slate-400 font-semibold uppercase">Time Zone</span>
+                    <span className="font-medium text-slate-700">{pdfTimeZone}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[9px] text-slate-400 font-semibold uppercase">Currency</span>
+                    <span className="font-medium text-slate-700">{pdfCurrency}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[9px] text-slate-400 font-semibold uppercase">Language</span>
+                    <span className="font-medium text-slate-700">{pdfLanguage}</span>
+                  </div>
+                </div>
+                <div className="h-16 bg-slate-200/50 rounded-lg overflow-hidden flex items-center justify-center border border-slate-300/40 relative">
+                  <span className="text-[9px] text-slate-400 font-bold tracking-widest uppercase">OpenStreetMap Interactive Link</span>
+                  <div className="absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: `url(${pdfImages[1] || ""})` }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
+            SkyNow Premier Travel Concierge Team
+          </div>
+        </div>
+
+        {/* PAGE 3: HOTELS */}
+        <div id="pdf-page-3" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
+          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">03 | Stays & Accommodation</span>
+            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
+          </div>
+
+          <div className="my-auto space-y-4">
+            <div className="space-y-1">
+              <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Bespoke Retreats</h2>
+              <p className="text-[11px] text-slate-400">Handpicked luxury hotels selected for comfort, service, and strategic locations.</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {pdfHotels.slice(0, 4).map((h, i) => (
+                <div key={i} className="border border-slate-100 rounded-xl overflow-hidden shadow-sm bg-white flex flex-col justify-between">
+                  <div className="h-28 bg-cover bg-center relative" style={{ backgroundImage: `url(${pdfImages[2 + (i % 2)] || ""})` }}>
+                    <div className="absolute top-2 right-2 bg-black/55 text-amber-400 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-0.5">
+                      ★ {h.stars || 5}
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2">
+                    <h3 className="text-xs font-bold text-slate-800 line-clamp-1">{h.name || "Luxury Resort"}</h3>
+                    <p className="text-[10px] text-slate-400 flex items-center gap-1">
+                      <span className="text-[#cca43b]">📍</span> {h.location || "Central District"}
+                    </p>
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      <span className="bg-emerald-50 text-emerald-700 text-[8px] px-1.5 py-0.5 rounded-md font-semibold">Breakfast Included</span>
+                      <span className="bg-slate-50 text-slate-600 text-[8px] px-1.5 py-0.5 rounded-md font-semibold">Free WiFi</span>
+                      <span className="bg-slate-50 text-slate-600 text-[8px] px-1.5 py-0.5 rounded-md font-semibold">Spa & Pool</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {pdfHotels.length === 0 && (
+                <div className="col-span-2 py-8 text-center text-xs text-slate-400 border border-dashed rounded-xl">
+                  No hotel accommodations specified. Standard boutique properties will be loaded.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
+            Accommodation tier: {pdfHotelCategory}
+          </div>
+        </div>
+
+        {/* PAGE 4: ITINERARY */}
+        <div id="pdf-page-4" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
+          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">04 | Day-by-Day Itinerary</span>
+            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
+          </div>
+
+          <div className="my-auto space-y-6">
+            <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Your Journey</h2>
+
+            <div className="space-y-4 relative pl-4 border-l border-slate-200">
+              {pdfItinerary.slice(0, 4).map((item: any, idx: number) => (
+                <div key={idx} className="relative space-y-1.5">
+                  <span className="absolute -left-[21px] top-1.5 h-3 w-3 rounded-full bg-[#cca43b] border-2 border-white" />
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-[#cca43b] uppercase tracking-wider">{item.day || `Day ${idx + 1}`}</span>
+                    <span className="text-[9px] bg-slate-50 text-slate-400 font-semibold px-2 py-0.5 rounded">Activity Tour Included</span>
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-800">{item.title || "Daily sightseeing details"}</h3>
+                  <p className="text-[10px] text-slate-500 leading-relaxed line-clamp-3">{item.desc || "Details of day's plans."}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
+            Meal Plan: Daily Breakfasts included. Guided lunches on key tours.
+          </div>
+        </div>
+
+        {/* PAGE 5: PRICING */}
+        <div id="pdf-page-5" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
+          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">05 | Investment & Package Pricing</span>
+            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
+          </div>
+
+          <div className="my-auto space-y-6">
+            <div className="space-y-1">
+              <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Pricing Summary</h2>
+              <p className="text-[11px] text-slate-400">Custom tailored quote valid for 7 days from proposal date.</p>
+            </div>
+
+            <div className="bg-[#022c22]/5 border border-[#cca43b]/20 rounded-2xl p-6 space-y-4">
+              <div className="space-y-2.5">
+                <div className="flex justify-between text-xs font-semibold text-slate-700">
+                  <span>Adult Base Rate ({pdfAdults} Guests)</span>
+                  <span>{pdfAdultPrice}</span>
+                </div>
+                {pdfChildren !== "0" && (
+                  <div className="flex justify-between text-xs font-semibold text-slate-700">
+                    <span>Child Base Rate ({pdfChildren} Guests)</span>
+                    <span>{pdfChildPrice}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-xs font-semibold text-slate-700">
+                  <span>Taxes & Service Fees</span>
+                  <span>{pdfTaxes}</span>
+                </div>
+                <div className="flex justify-between text-xs font-semibold text-emerald-600">
+                  <span>Special Discounts</span>
+                  <span>-{pdfDiscount}</span>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-200/60 pt-4 flex justify-between items-center">
+                <div>
+                  <span className="block text-[10px] font-bold text-slate-400 uppercase">Grand Total (Inclusive of Taxes)</span>
+                  <span className="text-2xl font-serif font-bold text-[#022c22]">{pdfBudget}</span>
+                </div>
+                <span className="text-[10px] font-semibold bg-[#cca43b] text-white px-3 py-1 rounded-full uppercase tracking-wider">Book Now</span>
+              </div>
+            </div>
+
+            <div className="p-4 border border-slate-100 rounded-xl bg-slate-50 space-y-1">
+              <span className="block text-[10px] text-amber-700 font-bold uppercase tracking-wider">Special Offer Inclusions:</span>
+              <p className="text-[10px] text-slate-500">{pdfOffers}</p>
+            </div>
+          </div>
+
+          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
+            For modifications or customized payment plans, please contact your concierge.
+          </div>
+        </div>
+
+        {/* PAGE 6: INCLUSIONS */}
+        <div id="pdf-page-6" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
+          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">06 | What's Included</span>
+            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
+          </div>
+
+          <div className="my-auto space-y-4">
+            <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Services Included</h2>
+
+            <div className="grid grid-cols-2 gap-4">
+              {pdfInclusions.slice(0, 6).map((item, idx) => (
+                <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-white flex items-start gap-3 shadow-xs">
+                  <span className="h-6 w-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0">✓</span>
+                  <div>
+                    <h3 className="text-xs font-semibold text-slate-700 leading-snug">{item}</h3>
+                  </div>
+                </div>
+              ))}
+              {pdfInclusions.length === 0 && (
+                <div className="col-span-2 py-8 text-center text-xs text-slate-400 border border-dashed rounded-xl">
+                  Standard luxury inclusions: Private transport, 5★ Accommodation, and Guides.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
+            Complimentary airport assistance and welcome gifts are included.
+          </div>
+        </div>
+
+        {/* PAGE 7: EXCLUSIONS */}
+        <div id="pdf-page-7" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
+          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">07 | Exclusions</span>
+            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
+          </div>
+
+          <div className="my-auto space-y-4">
+            <h2 className="font-serif text-2xl font-bold text-red-700">Package Exclusions</h2>
+
+            <div className="grid grid-cols-2 gap-4">
+              {pdfExclusions.slice(0, 6).map((item, idx) => (
+                <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-white flex items-start gap-3 shadow-xs">
+                  <span className="h-6 w-6 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">✗</span>
+                  <div>
+                    <h3 className="text-xs font-semibold text-slate-700 leading-snug">{item}</h3>
+                  </div>
+                </div>
+              ))}
+              {pdfExclusions.length === 0 && (
+                <div className="col-span-2 py-8 text-center text-xs text-slate-400 border border-dashed rounded-xl">
+                  Standard package exclusions: International flights and personal insurance.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
+            Items not listed under Inclusions are explicitly excluded.
+          </div>
+        </div>
+
+        {/* PAGE 8: TRAVEL ESSENTIALS */}
+        <div id="pdf-page-8" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
+          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">08 | Travel Essentials</span>
+            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
+          </div>
+
+          <div className="my-auto space-y-6">
+            <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Travel Preparation</h2>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Pre-Departure Packing</h3>
+                <ul className="space-y-2 text-[10px] text-slate-500">
+                  <li className="flex items-center gap-2">✔ Passport valid for 6 months</li>
+                  <li className="flex items-center gap-2">✔ Comfortable walking shoes</li>
+                  <li className="flex items-center gap-2">✔ Local currency cash & travel card</li>
+                  <li className="flex items-center gap-2">✔ Destination plug adapter</li>
+                  <li className="flex items-center gap-2">✔ Appropriate seasonal clothing</li>
+                </ul>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Visa Requirements</h3>
+                  <p className="text-[10px] text-slate-500 leading-relaxed">
+                    Visa procedures vary by nationality. Our expert consultants assist with forms, scheduling, and pre-travel check updates.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Local Currency Advice</h3>
+                  <p className="text-[10px] text-slate-500 leading-relaxed">
+                    Major cards are accepted globally, but small cash units are recommended for local vendors and services.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
+            Consult the weather report before packing standard apparel.
+          </div>
+        </div>
+
+        {/* PAGE 9: TERMS & CONDITIONS */}
+        <div id="pdf-page-9" className={`w-full aspect-[1/1.414] shadow-2xl relative p-12 flex flex-col justify-between ${bgPrimary}`}>
+          <div className="flex items-center justify-between border-b pb-4 border-[#cca43b]/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#cca43b]">09 | Important Policies</span>
+            <span className="text-[10px] text-slate-400 uppercase">{destName}</span>
+          </div>
+
+          <div className="my-auto space-y-6">
+            <h2 className="font-serif text-2xl font-bold text-[#cca43b]">Terms & Conditions</h2>
+
+            <div className="grid grid-cols-2 gap-6 text-[10px] text-slate-500 leading-relaxed">
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold uppercase text-slate-700">Cancellation Policy</h3>
+                <ul className="space-y-1.5 list-disc pl-4">
+                  <li>30 days prior: 15% cancellation fee.</li>
+                  <li>15 days prior: 50% cancellation fee.</li>
+                  <li>7 days prior: 100% cancellation fee.</li>
+                  <li>Flight tickets refund subject to airline rules.</li>
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold uppercase text-slate-700">Payment Policy</h3>
+                <ul className="space-y-1.5 list-disc pl-4">
+                  <li>25% deposit required to initiate bookings.</li>
+                  <li>50% milestone payment 30 days prior.</li>
+                  <li>Balance payment due 15 days before departure.</li>
+                  <li>All prices are nett rate in INR.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center text-[9px] text-slate-400 border-t pt-3 border-slate-100">
+            Standard travel regulations apply. SkyNow Holidays acts as coordinator.
+          </div>
+        </div>
+
+        {/* PAGE 10: THANK YOU */}
+        <div id="pdf-page-10" className="w-full aspect-[1/1.414] shadow-2xl relative overflow-hidden bg-[#022c22] text-white p-12 flex flex-col justify-between border-4 border-[#cca43b]">
+          <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-30" style={{ backgroundImage: `url(${pdfImages[4] || ""})` }} />
+          
+          <div className="z-10 text-right">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#cca43b]">SkyNow Premier Travel</span>
+          </div>
+
+          <div className="z-10 text-center my-auto space-y-6">
+            <h1 className="font-serif text-5xl font-bold text-white tracking-wider">THANK YOU</h1>
+            <p className="text-xs text-slate-300 tracking-widest uppercase">We look forward to hosting your next journey</p>
+            <div className="w-16 h-0.5 bg-[#cca43b] mx-auto" />
+            
+            <div className="mx-auto h-24 w-24 bg-white p-2 rounded-xl flex items-center justify-center border border-[#cca43b]/40">
+              <svg viewBox="0 0 100 100" className="h-full w-full text-slate-900">
+                <rect x="10" y="10" width="20" height="20" fill="currentColor"/>
+                <rect x="70" y="10" width="20" height="20" fill="currentColor"/>
+                <rect x="10" y="70" width="20" height="20" fill="currentColor"/>
+                <rect x="20" y="20" width="5" height="5" fill="white"/>
+                <rect x="75" y="20" width="5" height="5" fill="white"/>
+                <rect x="20" y="75" width="5" height="5" fill="white"/>
+                <rect x="40" y="40" width="20" height="20" fill="currentColor"/>
+                <rect x="45" y="10" width="10" height="15" fill="currentColor"/>
+                <rect x="75" y="45" width="15" height="10" fill="currentColor"/>
+                <rect x="10" y="45" width="15" height="15" fill="currentColor"/>
+                <rect x="45" y="75" width="15" height="15" fill="currentColor"/>
+              </svg>
+            </div>
+            <p className="text-[10px] text-slate-400">Scan to chat with our concierge team</p>
+          </div>
+
+          <div className="z-10 grid grid-cols-3 gap-4 border-t border-[#cca43b]/30 pt-6 text-[10px]">
+            <div>
+              <span className="block text-slate-400 font-semibold uppercase">Email Support</span>
+              <span className="font-bold text-white">concierge@skynow.com</span>
+            </div>
+            <div className="text-center">
+              <span className="block text-slate-400 font-semibold uppercase">WhatsApp 24/7</span>
+              <span className="font-bold text-white">{pdfEmergencyContact}</span>
+            </div>
+            <div className="text-right">
+              <span className="block text-slate-400 font-semibold uppercase">Website</span>
+              <span className="font-bold text-white">www.skynowholidays.com</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const handleCreatePackage = () => {
@@ -1860,6 +2515,353 @@ function PackagesTab({ appData }: { appData: any }) {
           />
         )}
       </AnimatePresence>
+
+      {/* Render Luxury Proposal PDF Generator Workspace Overlay */}
+      {pdfWorkspaceOpen && (
+        <div className="fixed inset-0 z-[150] bg-slate-950/90 backdrop-blur-md flex flex-col overflow-hidden font-sans">
+          {/* Top header bar */}
+          <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                <Sparkles className="h-5 w-5 text-amber-400" />
+              </div>
+              <div>
+                <h2 className="text-md font-bold">Premium AI Proposal Studio</h2>
+                <p className="text-xs text-slate-400">Luxury Travel Brochure Generator SaaS</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setPdfDarkMode(!pdfDarkMode)}
+                className="p-2 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition cursor-pointer"
+                title="Toggle Dark/Light Mode"
+              >
+                {pdfDarkMode ? <Sun className="h-4.5 w-4.5 text-amber-400" /> : <Moon className="h-4.5 w-4.5 text-slate-300" />}
+              </button>
+              <button
+                onClick={handleRegenerateImages}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-800 hover:bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-300 transition cursor-pointer"
+              >
+                <Camera className="h-3.5 w-3.5" /> Regenerate Images
+              </button>
+              <button
+                onClick={handleRegenerateAiText}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-800 hover:bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-300 transition cursor-pointer"
+              >
+                <Layers className="h-3.5 w-3.5" /> Optimize Copy
+              </button>
+              <button
+                onClick={triggerPrintProposal}
+                className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white shadow-md transition cursor-pointer"
+              >
+                <Download className="h-3.5 w-3.5" /> Print/Download PDF
+              </button>
+              <button
+                onClick={() => setPdfWorkspaceOpen(false)}
+                className="p-2 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+          
+          {/* Main workspace */}
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-slate-950">
+            {/* Left customizer panel */}
+            <div className="w-full md:w-[420px] shrink-0 border-r border-slate-800 overflow-y-auto p-6 space-y-6 text-slate-300 bg-slate-900/50">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">Customization Panel</h3>
+              
+              {/* Traveler Info */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Traveler Name</label>
+                  <input
+                    type="text"
+                    value={pdfTravelerName}
+                    onChange={(e) => setPdfTravelerName(e.target.value)}
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Travel Dates</label>
+                    <input
+                      type="text"
+                      value={pdfTravelDates}
+                      onChange={(e) => setPdfTravelDates(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Starting City</label>
+                    <input
+                      type="text"
+                      value={pdfStartingCity}
+                      onChange={(e) => setPdfStartingCity(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Adults Count</label>
+                    <input
+                      type="text"
+                      value={pdfAdults}
+                      onChange={(e) => setPdfAdults(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Children Count</label>
+                    <input
+                      type="text"
+                      value={pdfChildren}
+                      onChange={(e) => setPdfChildren(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Tiers & Budget */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Hotel Category</label>
+                    <input
+                      type="text"
+                      value={pdfHotelCategory}
+                      onChange={(e) => setPdfHotelCategory(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Total Budget</label>
+                    <input
+                      type="text"
+                      value={pdfBudget}
+                      onChange={(e) => setPdfBudget(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing Breakdown */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Pricing Breakdown</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Adult Price</label>
+                    <input
+                      type="text"
+                      value={pdfAdultPrice}
+                      onChange={(e) => setPdfAdultPrice(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Child Price</label>
+                    <input
+                      type="text"
+                      value={pdfChildPrice}
+                      onChange={(e) => setPdfChildPrice(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Taxes / Fees</label>
+                    <input
+                      type="text"
+                      value={pdfTaxes}
+                      onChange={(e) => setPdfTaxes(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Discounts</label>
+                    <input
+                      type="text"
+                      value={pdfDiscount}
+                      onChange={(e) => setPdfDiscount(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Special Offers</label>
+                  <input
+                    type="text"
+                    value={pdfOffers}
+                    onChange={(e) => setPdfOffers(e.target.value)}
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                  />
+                </div>
+              </div>
+
+              {/* Destination Facts */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Travel Facts</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Weather</label>
+                    <input
+                      type="text"
+                      value={pdfWeather}
+                      onChange={(e) => setPdfWeather(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">TimeZone</label>
+                    <input
+                      type="text"
+                      value={pdfTimeZone}
+                      onChange={(e) => setPdfTimeZone(e.target.value)}
+                      className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Currency Exchange</label>
+                  <input
+                    type="text"
+                    value={pdfCurrency}
+                    onChange={(e) => setPdfCurrency(e.target.value)}
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Local Languages</label>
+                  <input
+                    type="text"
+                    value={pdfLanguage}
+                    onChange={(e) => setPdfLanguage(e.target.value)}
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Emergency Contact</label>
+                  <input
+                    type="text"
+                    value={pdfEmergencyContact}
+                    onChange={(e) => setPdfEmergencyContact(e.target.value)}
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3.5 py-2 text-xs text-white outline-none focus:border-amber-500 transition"
+                  />
+                </div>
+              </div>
+
+              {/* Text Edit Blocks */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Content Summary</h4>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Overview</label>
+                  <textarea
+                    value={pdfOverview}
+                    rows={4}
+                    onChange={(e) => setPdfOverview(e.target.value)}
+                    className="w-full rounded-xl bg-slate-900 border border-slate-800 p-3 text-xs text-white outline-none focus:border-amber-500 transition resize-none"
+                  />
+                </div>
+                
+                {/* Highlights List */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Edit Highlights</label>
+                  <div className="space-y-2">
+                    {pdfHighlights.map((h, i) => (
+                      <div key={i} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={h}
+                          onChange={(e) => {
+                            const u = [...pdfHighlights];
+                            u[i] = e.target.value;
+                            setPdfHighlights(u);
+                          }}
+                          className="flex-1 rounded-xl bg-slate-900 border border-slate-800 px-3 py-1.5 text-xs text-white outline-none focus:border-amber-500 transition"
+                        />
+                        <button
+                          onClick={() => setPdfHighlights(pdfHighlights.filter((_, idx) => idx !== i))}
+                          className="p-1.5 rounded-lg bg-red-950 border border-red-900/30 text-red-400 hover:text-red-350 transition cursor-pointer"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => setPdfHighlights([...pdfHighlights, "New Luxury Sightseeing Excursion"])}
+                      className="text-xs text-amber-500 hover:underline flex items-center gap-1 mt-1 font-semibold cursor-pointer"
+                    >
+                      + Add Highlight
+                    </button>
+                  </div>
+                </div>
+
+                {/* Itinerary List */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Edit Itinerary Days</label>
+                  <div className="space-y-3">
+                    {pdfItinerary.map((item, idx) => (
+                      <div key={idx} className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-bold text-amber-500">{item.day || `Day ${idx + 1}`}</span>
+                          <button
+                            onClick={() => setPdfItinerary(pdfItinerary.filter((_, i) => i !== idx))}
+                            className="p-1 rounded bg-red-950 border border-red-900/30 text-red-400 hover:text-red-300 transition cursor-pointer"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={item.title}
+                          placeholder="Day Title"
+                          onChange={(e) => {
+                            const u = [...pdfItinerary];
+                            u[idx] = { ...u[idx], title: e.target.value };
+                            setPdfItinerary(u);
+                          }}
+                          className="w-full rounded bg-slate-950 border border-slate-800 px-2 py-1 text-xs text-white outline-none focus:border-amber-500 transition"
+                        />
+                        <textarea
+                          value={item.desc}
+                          placeholder="Day Description"
+                          rows={2}
+                          onChange={(e) => {
+                            const u = [...pdfItinerary];
+                            u[idx] = { ...u[idx], desc: e.target.value };
+                            setPdfItinerary(u);
+                          }}
+                          className="w-full rounded bg-slate-950 border border-slate-800 px-2 py-1 text-xs text-white outline-none focus:border-amber-500 transition resize-none"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => setPdfItinerary([...pdfItinerary, { day: `Day ${pdfItinerary.length + 1}`, title: "New Scenic Adventure", desc: "Spend the day enjoying sightseeing highlights." }])}
+                      className="text-xs text-amber-500 hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                    >
+                      + Add Itinerary Day
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Right preview canvas */}
+            <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center gap-12 bg-slate-950 relative">
+              <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur border border-slate-800 text-[10px] text-slate-400 px-2.5 py-1 rounded-lg">
+                Live A4 Pages View (10 Sheets Total)
+              </div>
+              
+              {/* Render sheets list */}
+              {renderA4Sheets()}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
